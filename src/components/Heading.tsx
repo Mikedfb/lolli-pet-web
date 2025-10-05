@@ -1,5 +1,6 @@
 import '../styles/global.css';
 import Logo from '../assets/Logo.svg';
+import { Link } from 'react-router-dom';
 
 export function Heading() {
   return (
@@ -9,24 +10,29 @@ export function Heading() {
         <img src={Logo} alt='Logo Lolli Pet' className='logo' />
       </div>
       <nav className='nav'>
-        <a href='/home.html' className='nav-a'>
+        <Link to='/' className='nav-a'>
           HOME
-        </a>
-        <a href='/cadastrar_cliente.html' className='nav-a'>
+        </Link>
+
+        <Link to='/cadastrar-cliente' className='nav-a'>
           CADASTRAR CLIENTE
-        </a>
-        <a href='/agendamento_clinico.html' className='nav-a'>
-          AGENDAMENTO CLINICO
-        </a>
-        <a href='/agendamento_petshop.html' className='nav-a'>
+        </Link>
+
+        <Link to='/agendamento-clinico' className='nav-a'>
+          AGENDAMENTO CLINÍCO
+        </Link>
+
+        <Link to='/agendamento-petshop' className='nav-a'>
           AGENDAMENTO PETSHOP
-        </a>
-        <a href='/agenda.html' className='nav-a'>
+        </Link>
+
+        <Link to='/agenda' className='nav-a'>
           AGENDA DO DIA
-        </a>
-        <a href='/prontuario.html' className='nav-a'>
+        </Link>
+
+        <Link to='/prontuario.html' className='nav-a'>
           PRONTUÁRIO
-        </a>
+        </Link>
       </nav>
     </header>
   );

@@ -1,7 +1,7 @@
 import { BathIcon, CalendarDaysIcon, StethoscopeIcon } from 'lucide-react';
 import '../styles/global.css';
 
-export function Layout() {
+export function Home() {
   return (
     <main className='hero-section-container'>
       <section className='hero-secion-content'>
