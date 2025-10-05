@@ -1,5 +1,6 @@
 import { BathIcon, CalendarDaysIcon, StethoscopeIcon } from 'lucide-react';
 import '../styles/global.css';
+import { Link } from 'react-router-dom';
 
 export function Home() {
   return (
@@ -14,18 +15,15 @@ export function Home() {
             tudo em um só lugar.
           </p>
           <div className='hero-buttons-container'>
-            <a
-              href='/agendamento_clinico.html'
-              className=' hero-buttons-content '
-            >
+            <Link to='/agendamento-clinico' className=' hero-buttons-content '>
               Agendar Consulta
-            </a>
-            <a
-              href='/agendamento_petshop.html'
+            </Link>
+            <Link
+              to='/agendamento-petshop'
               className='hero-buttons-content hero-buttons'
             >
               Agendar Petshop
-            </a>
+            </Link>
           </div>
         </div>
       </section>

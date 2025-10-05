@@ -30,7 +30,7 @@ export function Heading() {
           AGENDA DO DIA
         </Link>
 
-        <Link to='/prontuario.html' className='nav-a'>
+        <Link to='/prontuario' className='nav-a'>
           PRONTUÁRIO
         </Link>
       </nav>
