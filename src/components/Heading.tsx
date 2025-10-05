@@ -3,50 +3,28 @@ import Logo from '../assets/Logo.svg';
 
 export function Heading() {
   return (
-    <header className='flex justify-around text-[0.5rem] items-center h-30 bg-pink-400'>
+    <header className='navContent'>
       <div>
         {/* Necessita aprimirar logo */}
-        <img
-          src={Logo}
-          alt='Logo Lolli Pet'
-          className='h-20 transition duration-300 ease-in-out hover:scale-110'
-        />
+        <img src={Logo} alt='Logo Lolli Pet' className='logo' />
       </div>
-      <nav className='flex gap-6 '>
-        <a
-          href='/home.html'
-          className='text-yellow-300 font-bold py-2.5 px-3.5 rounded-md  transition-colors duration-300  hover:bg-blue-200'
-        >
+      <nav className='nav'>
+        <a href='/home.html' className='nav-a'>
           HOME
         </a>
-        <a
-          href='/cadastrar_cliente.html'
-          className='text-yellow-300 font-bold py-2.5 px-3.5 rounded-md  transition-colors duration-300  hover:bg-blue-200'
-        >
+        <a href='/cadastrar_cliente.html' className='nav-a'>
           CADASTRAR CLIENTE
         </a>
-        <a
-          href='/agendamento_clinico.html'
-          className='text-yellow-300 font-bold py-2.5 px-3.5 rounded-md  transition-colors duration-300  hover:bg-blue-200'
-        >
+        <a href='/agendamento_clinico.html' className='nav-a'>
           AGENDAMENTO CLINICO
         </a>
-        <a
-          href='/agendamento_petshop.html'
-          className='text-yellow-300 font-bold py-2.5 px-3.5 rounded-md  transition-colors duration-300  hover:bg-blue-200'
-        >
+        <a href='/agendamento_petshop.html' className='nav-a'>
           AGENDAMENTO PETSHOP
         </a>
-        <a
-          href='/agenda.html'
-          className='text-yellow-300 font-bold py-2.5 px-3.5 rounded-md  transition-colors duration-300  hover:bg-blue-200'
-        >
+        <a href='/agenda.html' className='nav-a'>
           AGENDA DO DIA
         </a>
-        <a
-          href='/prontuario.html'
-          className='text-yellow-300 font-bold py-2.5 px-3.5 rounded-md  transition-colors duration-300  hover:bg-blue-200'
-        >
+        <a href='/prontuario.html' className='nav-a'>
           PRONTUÁRIO
         </a>
       </nav>
