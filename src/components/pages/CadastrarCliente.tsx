@@ -1,192 +1,268 @@
+import {
+  UserPlus,
+  User,
+  Phone,
+  Mail,
+  PawPrint,
+  Dog,
+  PlusCircle,
+  Trash2,
+} from 'lucide-react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { User, Cat, PlusCircle, Trash2 } from 'lucide-react';
-import {
-  cadastroClienteSchemas,
-  type CadastroClienteFormData,
-} from '../schemas/CadastroClienteSchemas';
+import { z } from 'zod';
+
+// --- ESQUEMA ZOD DOS PETS ---
+const petSchema = z.object({
+  nome: z.string().min(1, 'O nome do Pet é obrigatório.'),
+  especie: z.string().min(1, 'A espécie (Cão, Gato, etc.) é obrigatória.'),
+  raca: z.string().max(50, 'Máximo de 50 caracteres').nullable().optional(),
+});
+
+// --- ESQUEMA ZOD DO CLIENTE ---
+const cadastrarClienteSchema = z.object({
+  nome: z.string().min(1, 'O nome completo do cliente é obrigatório.'),
+  email: z.string().email('E-mail inválido.').min(1, 'O e-mail é obrigatório.'),
+  telefone: z
+    .string()
+    .regex(
+      /^\(\d{2}\)\s?\d{4,5}-\d{4}$/,
+      'Telefone inválido (Ex: (00) 00000-0000).',
+    ),
+
+  // Array de Pets - Deve ter pelo menos 1 item
+  pets: z
+    .array(petSchema)
+    .min(
+      1,
+      'Pelo menos um Pet deve ser cadastrado. Use o botão "Adicionar Pet".',
+    ),
+});
+
+type PetFormData = z.infer<typeof petSchema>;
+type CadastrarClienteFormData = z.infer<typeof cadastrarClienteSchema>;
 
 export function CadastrarCliente() {
   const {
     register,
     handleSubmit,
-    control, // Necessário para o useFieldArray
+    control,
     formState: { errors },
-  } = useForm<CadastroClienteFormData>({
-    resolver: zodResolver(cadastroClienteSchemas),
+  } = useForm<CadastrarClienteFormData>({
+    resolver: zodResolver(cadastrarClienteSchema),
     defaultValues: {
       nome: '',
       email: '',
       telefone: '',
-      pets: [
-        // Adiciona um pet inicial por padrão para que o usuário veja os campos
-        { nomePet: '', especie: '', raca: '' },
-      ],
+      // Inicializa com um Pet obrigatório
+      pets: [{ nome: '', especie: '', raca: '' }],
     },
   });
 
-  // USEFIELDARRAY: Conecta o array 'pets' ao controle do formulário
+  // Hook para gerenciar campos dinâmicos (Pets)
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'pets', // Deve ser o nome do array no schema (pets: z.array(...))
+    name: 'pets',
   });
 
-  function handleFormSubmit(data: CadastroClienteFormData) {
-    console.log('Dados do cadastro validados e prontos', data);
-    // console.log(data.pets); // Array de pets
+  function onSubmit(data: CadastrarClienteFormData) {
+    console.log('Cliente e Pets Cadastrados:', data);
+    alert(
+      `Cliente ${data.nome} cadastrado com sucesso, com ${data.pets.length} pet(s)!`,
+    );
+    // Lógica de API aqui
   }
 
   return (
-    <div className='p-8 flex justify-center items-start min-h-[calc(100vh-150px)]'>
-      <div className='bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl'>
-        <h1 className='text-3xl font-bold text-center text-pink-600 mb-6 border-b-2 border-yellow-400 pb-2'>
-          Cadastro de Clientes e Pets
+    <div className='p-8 bg-gray-50 min-h-[calc(100vh-150px)] flex justify-center items-start'>
+      <div className='container max-w-3xl w-full'>
+        <h1 className='text-3xl font-extrabold text-center text-pink-600 mb-6 border-b-2 border-yellow-400 pb-2 flex items-center justify-center gap-2'>
+          <UserPlus size={30} />
+          Cadastro de Cliente e Pets
         </h1>
+        <p className='text-center text-gray-500 mb-8'>
+          Cadastre as informações do cliente e de todos os seus animais de
+          estimação.
+        </p>
 
         <form
-          onSubmit={handleSubmit(handleFormSubmit)}
-          className='flex flex-col gap-5'
+          onSubmit={handleSubmit(onSubmit)}
+          className='space-y-6 p-8 bg-white rounded-xl shadow-lg border border-gray-100'
         >
-          <fieldset className='border border-cyan-600 p-5 rounded-md'>
-            <legend className='font-bold text-lg text-cyan-600 px-2 flex items-center gap-2'>
-              <User size={20} />
+          <fieldset className='border-2 border-cyan-500 p-4 rounded-md'>
+            <legend className='font-bold text-lg text-cyan-700 px-2'>
               Dados do Cliente
             </legend>
-            <div className='flex flex-col gap-3'>
-              <label htmlFor='nome' className='font-medium text-gray-700'>
-                Nome Completo:
-              </label>
-              <input
-                type='text'
-                id='nome'
-                {...register('nome')}
-                className='p-2 border rounded'
-              />
-              {errors.nome && (
-                <p className='text-red-500 text-sm'>{errors.nome.message}</p>
-              )}
 
-              <label htmlFor='email' className='font-medium text-gray-700'>
-                E-mail:
-              </label>
-              <input
-                type='text'
-                id='email'
-                {...register('email')}
-                className='p-2 border rounded'
-              />
-              {errors.email && (
-                <p className='text-red-500 text-sm'>{errors.email.message}</p>
-              )}
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+              <div className='form-group md:col-span-3'>
+                <label
+                  htmlFor='nome'
+                  className=' font-semibold text-gray-700 flex items-center gap-1'
+                >
+                  <User size={16} className='text-cyan-500' /> Nome Completo:
+                </label>
+                <input
+                  type='text'
+                  id='nome'
+                  {...register('nome')}
+                  className='w-full p-2 border border-gray-300 rounded focus:border-cyan-500'
+                />
+                {errors.nome && (
+                  <p className='text-red-500 text-sm mt-1'>
+                    {errors.nome.message}
+                  </p>
+                )}
+              </div>
 
-              <label htmlFor='telefone' className='font-medium text-gray-700'>
-                Telefone:
-              </label>
-              <input
-                type='tel'
-                id='telefone'
-                {...register('telefone')}
-                className='p-2 border rounded'
-              />
-              {errors.telefone && (
-                <p className='text-red-500 text-sm'>
-                  {errors.telefone.message}
-                </p>
-              )}
+              <div className='form-group'>
+                <label
+                  htmlFor='email'
+                  className=' font-semibold text-gray-700 flex items-center gap-1'
+                >
+                  <Mail size={16} className='text-cyan-500' /> E-mail:
+                </label>
+                <input
+                  type='email'
+                  id='email'
+                  {...register('email')}
+                  className='w-full p-2 border border-gray-300 rounded focus:border-cyan-500'
+                />
+                {errors.email && (
+                  <p className='text-red-500 text-sm mt-1'>
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+
+              <div className='form-group'>
+                <label
+                  htmlFor='telefone'
+                  className=' font-semibold text-gray-700 flex items-center gap-1'
+                >
+                  <Phone size={16} className='text-cyan-500' /> Telefone:
+                </label>
+                <input
+                  type='tel'
+                  id='telefone'
+                  {...register('telefone')}
+                  placeholder='(00) 00000-0000'
+                  className='w-full p-2 border border-gray-300 rounded focus:border-cyan-500'
+                />
+                {errors.telefone && (
+                  <p className='text-red-500 text-sm mt-1'>
+                    {errors.telefone.message}
+                  </p>
+                )}
+              </div>
             </div>
           </fieldset>
 
-          <fieldset className='border border-pink-600 p-5 rounded-md'>
-            <legend className='font-bold text-lg text-pink-600 px-2 flex items-center gap-2'>
-              <Cat size={20} />
-              Dados dos Pets
+          <fieldset className='border-2 border-cyan-500 p-4 rounded-md space-y-4'>
+            <legend className='font-bold text-lg text-cyan-700 px-2 flex items-center gap-2'>
+              <Dog size={20} className='text-cyan-500' /> Dados dos Pets
             </legend>
 
-            {/* Iteração sobre o array de pets */}
             {fields.map((field, index) => (
-              // O div externo precisa de uma key única
               <div
                 key={field.id}
-                className='pet-block p-4 border border-pink-300 rounded-md bg-pink-50 mt-4'
+                className='pet-block border border-gray-300 p-4 rounded-lg bg-gray-50 space-y-3'
               >
-                <h4 className='font-bold text-md text-pink-700 mb-3'>
-                  Pet {index + 1}
-                </h4>
+                <div className='flex justify-between items-center border-b border-pink-300 pb-2 mb-3'>
+                  <h4 className='text-xl font-bold text-pink-600 flex items-center gap-2'>
+                    <PawPrint size={18} /> Pet {index + 1}
+                  </h4>
 
-                <div className='flex flex-col gap-3'>
-                  <label
-                    htmlFor={`pets.${index}.nomePet`}
-                    className='font-medium text-gray-700'
-                  >
-                    Nome do Pet:
-                  </label>
-                  <input
-                    type='text'
-                    id={`pets.${index}.nomePet`}
-                    {...register(`pets.${index}.nomePet`)}
-                    className='p-2 border rounded'
-                  />
-                  {errors.pets?.[index]?.nomePet && (
-                    <p className='text-red-500 text-sm'>
-                      {errors.pets[index]?.nomePet.message}
-                    </p>
+                  {/* O botão remover só aparece se houver mais de um pet */}
+                  {index > 0 && (
+                    <button
+                      type='button'
+                      onClick={() => remove(index)}
+                      className='p-2 bg-red-400 text-white rounded-full hover:bg-red-500 transition flex items-center gap-1 text-sm'
+                    >
+                      <Trash2 size={16} /> Remover
+                    </button>
                   )}
-
-                  <label
-                    htmlFor={`pets.${index}.especie`}
-                    className='font-medium text-gray-700'
-                  >
-                    Espécie:
-                  </label>
-                  <input
-                    type='text'
-                    id={`pets.${index}.especie`}
-                    {...register(`pets.${index}.especie`)}
-                    className='p-2 border rounded'
-                  />
-                  {errors.pets?.[index]?.especie && (
-                    <p className='text-red-500 text-sm'>
-                      {errors.pets[index]?.especie.message}
-                    </p>
-                  )}
-
-                  {/* Raça */}
-                  <label
-                    htmlFor={`pets.${index}.raca`}
-                    className='font-medium text-gray-700'
-                  >
-                    Raça:
-                  </label>
-                  <input
-                    type='text'
-                    id={`pets.${index}.raca`}
-                    {...register(`pets.${index}.raca`)}
-                    className='p-2 border rounded'
-                  />
                 </div>
 
-                {fields.length > 1 && (
-                  <button
-                    type='button'
-                    onClick={() => remove(index)}
-                    className='mt-3 p-2 bg-red-500 text-white font-semibold rounded hover:bg-red-600 transition flex items-center justify-center gap-2 w-full'
-                  >
-                    <Trash2 size={18} /> Remover Pet
-                  </button>
-                )}
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                  <div className='form-group'>
+                    <label
+                      htmlFor={`pets.${index}.nome`}
+                      className='block font-semibold text-gray-700'
+                    >
+                      Nome do Pet:
+                    </label>
+                    <input
+                      type='text'
+                      id={`pets.${index}.nome`}
+                      {...register(`pets.${index}.nome`)}
+                      className='w-full p-2 border border-gray-300 rounded focus:border-pink-500'
+                    />
+                    {errors.pets?.[index]?.nome && (
+                      <p className='text-red-500 text-sm mt-1'>
+                        {errors.pets[index].nome.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className='form-group'>
+                    <label
+                      htmlFor={`pets.${index}.especie`}
+                      className='block font-semibold text-gray-700'
+                    >
+                      Espécie:
+                    </label>
+                    <input
+                      type='text'
+                      id={`pets.${index}.especie`}
+                      {...register(`pets.${index}.especie`)}
+                      placeholder='Ex: Cachorro, Gato'
+                      className='w-full p-2 border border-gray-300 rounded focus:border-pink-500'
+                    />
+                    {errors.pets?.[index]?.especie && (
+                      <p className='text-red-500 text-sm mt-1'>
+                        {errors.pets[index].especie.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className='form-group'>
+                    <label
+                      htmlFor={`pets.${index}.raca`}
+                      className='block font-semibold text-gray-700'
+                    >
+                      Raça (Opcional):
+                    </label>
+                    <input
+                      type='text'
+                      id={`pets.${index}.raca`}
+                      {...register(`pets.${index}.raca`)}
+                      className='w-full p-2 border border-gray-300 rounded focus:border-pink-500'
+                    />
+                    {errors.pets?.[index]?.raca && (
+                      <p className='text-red-500 text-sm mt-1'>
+                        {errors.pets[index].raca.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             ))}
 
-            {errors.pets && (
-              <p className='text-red-500 text-sm font-bold mt-3'>
-                ⚠️ {errors.pets.message}
+            {/* Exibe erro se não houver pets */}
+            {errors.pets?.root && (
+              <p className='text-red-500 text-sm mt-1 font-semibold'>
+                {errors.pets.root.message}
               </p>
             )}
 
             <button
               type='button'
-              onClick={() => append({ nomePet: '', especie: '', raca: '' })}
-              className='mt-5 p-2 bg-gray-400 text-white font-semibold rounded hover:bg-gray-500 transition flex items-center justify-center gap-2'
+              onClick={() =>
+                append({ nome: '', especie: '', raca: '' } as PetFormData)
+              }
+              className='mt-4 p-2 bg-cyan-500 text-white font-bold rounded-md hover:bg-cyan-600 transition flex items-center justify-center gap-2'
             >
               <PlusCircle size={20} /> Adicionar outro Pet
             </button>
@@ -194,9 +270,9 @@ export function CadastrarCliente() {
 
           <button
             type='submit'
-            className='mt-4 p-3 bg-pink-600 text-white font-semibold rounded hover:bg-pink-700 transition'
+            className='w-full p-3 bg-pink-500 text-white font-bold rounded-md hover:bg-pink-600 transition text-lg'
           >
-            Cadastrar Cliente
+            Cadastrar Cliente e Pets
           </button>
         </form>
       </div>

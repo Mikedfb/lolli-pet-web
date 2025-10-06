@@ -1,395 +1,401 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { v4 as uuidv4 } from 'uuid';
 import {
+  ClipboardList,
   Search,
+  Edit,
   FileText,
-  PlusCircle,
-  Calendar,
   User,
-  Stethoscope,
-  MessageSquare,
+  PawPrint,
+  Calendar,
+  Paperclip,
+  PlusCircle,
 } from 'lucide-react';
+import React, { useState } from 'react';
 
-// --- TIPOS E SCHEMAS ---
+// --- INTERFACES DE DADOS (Mock) ---
 
-interface ProntuarioEntrada {
+interface HistoricoEntry {
   id: string;
   data: string;
-  medico: string;
-  tipo: 'consulta' | 'exame' | 'cirurgia' | 'outro';
+  tipo: 'Consulta' | 'Exame' | 'Vacina' | 'Banho' | 'Tosa' | 'Outro';
   descricao: string;
+  responsavel: string;
+  arquivos: { nome: string; url: string }[];
 }
 
-interface PetProntuario {
+interface Pet {
   id: string;
   nome: string;
-  cliente: string;
-  raca: string;
   especie: string;
-  historico: ProntuarioEntrada[];
+  raca: string;
+  cliente: string;
+  telefone: string;
+  historico: HistoricoEntry[];
 }
 
-const novaEntradaSchema = z.object({
-  data: z.string().min(1, 'A data é obrigatória.'),
-  medico: z.string().min(3, 'O nome do médico é obrigatório.'),
-  tipo: z.enum(['consulta', 'exame', 'cirurgia', 'outro']),
-  descricao: z
-    .string()
-    .min(10, 'A descrição deve ter no mínimo 10 caracteres.'),
-});
+// --- DADOS MOCKADOS PARA EXEMPLO (Mantidos) ---
 
-type NovaEntradaFormData = z.infer<typeof novaEntradaSchema>;
-
-// --- MOCK DATA ---
-const mockProntuarios: PetProntuario[] = [
+const mockPacientes: Pet[] = [
   {
-    id: 'pet-1',
-    nome: 'Max',
-    cliente: 'Ana Silva',
-    raca: 'Golden Retriever',
+    id: 'P001',
+    nome: 'Rex',
     especie: 'Cachorro',
+    raca: 'Golden Retriever',
+    cliente: 'Ana Silva',
+    telefone: '(11) 98765-4321',
     historico: [
       {
-        id: 'hist-1',
-        data: '2025-05-15',
-        medico: 'Dr. João Mendes',
-        tipo: 'consulta',
-        descricao:
-          'Consulta de rotina. Peso: 32kg. Vacina V10 aplicada. Recomendado vermífugo mensal.',
+        id: 'H005',
+        data: '15/10/2025',
+        tipo: 'Banho',
+        descricao: 'Banho e secagem padrão.',
+        responsavel: 'Prof. João',
+        arquivos: [],
       },
       {
-        id: 'hist-2',
-        data: '2025-08-01',
-        medico: 'Dra. Maria Clara',
-        tipo: 'exame',
-        descricao:
-          'Exame de sangue completo. Leve alteração hepática detectada. Prescrito suplemento vitamínico por 30 dias.',
+        id: 'H004',
+        data: '10/09/2025',
+        tipo: 'Consulta',
+        descricao: 'Check-up de rotina. Peso normal, sem intercorrências.',
+        responsavel: 'Dr(a). Juliana',
+        arquivos: [],
+      },
+      {
+        id: 'H003',
+        data: '25/08/2025',
+        tipo: 'Vacina',
+        descricao: 'Vacina V8 anual aplicada.',
+        responsavel: 'Dr(a). Juliana',
+        arquivos: [{ nome: 'Cartão de Vacina.pdf', url: '#' }],
       },
     ],
   },
   {
-    id: 'pet-2',
-    nome: 'Nina',
-    cliente: 'Carlos Alves',
-    raca: 'Siamês',
+    id: 'P002',
+    nome: 'Miau',
     especie: 'Gato',
+    raca: 'Siamês',
+    cliente: 'Carlos Souza',
+    telefone: '(21) 99887-7665',
     historico: [
       {
-        id: 'hist-3',
-        data: '2025-09-01',
-        medico: 'Dr. João Mendes',
-        tipo: 'consulta',
+        id: 'H002',
+        data: '01/10/2025',
+        tipo: 'Consulta',
         descricao:
-          'Check-up anual. Peso: 4kg. Gengivite leve. Recomendada mudança para ração dental.',
+          'Queixa de apatia e falta de apetite. Prescrito antibiótico por 7 dias.',
+        responsavel: 'Dr(a). Pedro',
+        arquivos: [
+          { nome: 'RaioX Abdominal.jpg', url: '#' },
+          { nome: 'Exame de Sangue.pdf', url: '#' },
+        ],
+      },
+      {
+        id: 'H001',
+        data: '15/09/2025',
+        tipo: 'Banho',
+        descricao: 'Banho hipoalergênico.',
+        responsavel: 'Prof. Fernanda',
+        arquivos: [],
       },
     ],
   },
 ];
 
-const EntradaHistoricoCard = ({ entrada }: { entrada: ProntuarioEntrada }) => {
-  const tipoMap = {
-    consulta: { text: 'Consulta', color: 'border-cyan-500', icon: Stethoscope },
-    exame: {
-      text: 'Exame/Diagnóstico',
-      color: 'border-blue-500',
-      icon: MessageSquare,
-    },
-    cirurgia: { text: 'Cirurgia', color: 'border-red-500', icon: PlusCircle },
-    outro: {
-      text: 'Outro Atendimento',
-      color: 'border-gray-500',
-      icon: FileText,
-    },
+// --- COMPONENTE DETALHES DO PRONTUÁRIO ---
+
+interface ProntuarioDetalhesProps {
+  pet: Pet;
+  onClose: () => void;
+}
+
+const ProntuarioDetalhes: React.FC<ProntuarioDetalhesProps> = ({
+  pet,
+  onClose,
+}) => {
+  // Ordena o histórico pela data (mais recente primeiro)
+  const historicoOrdenado = [...pet.historico].sort(
+    (a, b) =>
+      new Date(b.data.split('/').reverse().join('-')).getTime() -
+      new Date(a.data.split('/').reverse().join('-')).getTime(),
+  );
+
+  // Simula o Anexo de Arquivo
+  const handleAnexarArquivo = () => {
+    alert(
+      `Abrindo seletor de arquivos para anexar um novo documento ao Pet ${pet.nome}.`,
+    );
+    // Aqui seria a lógica de upload e atualização do histórico.
   };
-  const details = tipoMap[entrada.tipo] || tipoMap.outro;
 
   return (
-    <div
-      className={`p-4 bg-white shadow-md rounded-lg border-l-4 ${details.color} mb-4 transition hover:shadow-lg`}
-    >
-      <div className='flex items-center justify-between mb-2 pb-2 border-b border-gray-100'>
-        <div
-          className={`font-bold text-lg text-gray-800 flex items-center gap-2`}
+    <div className='mt-8 bg-white p-6 rounded-xl shadow-lg border-t-4 border-pink-500'>
+      <div className='flex justify-between items-start border-b border-gray-200 pb-3 mb-4'>
+        <h2 className='text-2xl font-bold text-pink-700 flex items-center gap-2'>
+          <FileText size={24} /> Prontuário de {pet.nome}
+        </h2>
+        <button
+          onClick={onClose}
+          className='p-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition text-sm font-semibold'
         >
-          <details.icon size={20} className='text-gray-500' />
-          {details.text}
-        </div>
-        <span
-          className={`text-sm font-semibold text-gray-600 flex items-center gap-1`}
-        >
-          <Calendar size={14} />
-          {entrada.data}
-        </span>
+          Fechar
+        </button>
       </div>
-      <p className='text-sm text-gray-700 mb-2 whitespace-pre-line'>
-        {entrada.descricao}
-      </p>
-      <p className='text-xs text-gray-500 flex items-center gap-1'>
-        <Stethoscope size={14} />
-        <span className='font-semibold'>Veterinário:</span> {entrada.medico}
-      </p>
+
+      {/* Informações Básicas */}
+      <div className='grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-6 pb-4 border-b border-gray-100'>
+        <p>
+          <strong>ID:</strong> {pet.id}
+        </p>
+        <p>
+          <strong>Espécie:</strong> {pet.especie}
+        </p>
+        <p>
+          <strong>Raça:</strong> {pet.raca}
+        </p>
+        <p>
+          <strong>Cliente:</strong> {pet.cliente}
+        </p>
+      </div>
+
+      {/* HISTÓRICO DE ATENDIMENTOS (Consultas e Banhos) */}
+      <h3 className='text-xl font-bold text-cyan-700 mb-3 flex items-center gap-2'>
+        <Calendar size={20} /> Histórico de Atendimentos
+      </h3>
+
+      <div className='space-y-4'>
+        {historicoOrdenado.map(entry => (
+          <div
+            key={entry.id}
+            // Cor da borda baseada no tipo de serviço
+            className={`p-4 rounded-lg shadow-sm border-l-4 ${
+              entry.tipo === 'Banho' || entry.tipo === 'Tosa'
+                ? 'border-pink-300 bg-pink-50'
+                : 'border-cyan-300 bg-cyan-50'
+            }`}
+          >
+            <div className='flex justify-between items-center mb-2'>
+              <span className='text-xs font-semibold uppercase text-gray-600'>
+                {entry.data}
+              </span>
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-bold ${
+                  entry.tipo === 'Banho' || entry.tipo === 'Tosa'
+                    ? 'bg-pink-200 text-pink-800'
+                    : 'bg-cyan-200 text-cyan-800'
+                }`}
+              >
+                {entry.tipo}
+              </span>
+            </div>
+            <p className='text-sm font-semibold text-gray-800 mb-1'>
+              {entry.descricao}
+            </p>
+            <p className='text-xs italic text-gray-500'>
+              Responsável: {entry.responsavel}
+            </p>
+
+            {/* ANEXOS */}
+            {entry.arquivos.length > 0 && (
+              <div className='mt-2 border-t border-gray-100 pt-2'>
+                <p className='text-xs font-semibold text-gray-700 flex items-center gap-1'>
+                  <Paperclip size={14} /> Anexos:
+                </p>
+                <div className='flex flex-wrap gap-2 mt-1'>
+                  {entry.arquivos.map(
+                    (
+                      file, // <-- CORRIGIDO: Removido o parâmetro 'i'
+                    ) => (
+                      <a
+                        key={file.nome} // <-- CORRIGIDO: Usando file.nome como key
+                        href={file.url}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-xs text-yellow-700 bg-yellow-100 px-2 py-1 rounded-full hover:bg-yellow-200 transition'
+                      >
+                        {file.nome}
+                      </a>
+                    ),
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+
+        {historicoOrdenado.length === 0 && (
+          <p className='text-center text-gray-500 italic p-4 border border-dashed rounded-lg'>
+            Não há histórico de atendimentos registrado para este Pet.
+          </p>
+        )}
+      </div>
+
+      {/* BOTÃO PARA ANEXAR ARQUIVOS */}
+      <div className='mt-6 pt-4 border-t border-gray-100 text-center'>
+        <button
+          onClick={handleAnexarArquivo}
+          className='p-3 bg-cyan-500 text-white font-bold rounded-md hover:bg-cyan-600 transition flex items-center justify-center gap-2 mx-auto'
+        >
+          <PlusCircle size={20} /> Anexar Novo Arquivo/Imagem
+        </button>
+      </div>
     </div>
   );
 };
 
+// --- COMPONENTE PRINCIPAL (PRONTUÁRIO) ---
+
 export function Prontuario() {
-  const [petEncontrado, setPetEncontrado] = useState<PetProntuario | null>(
-    null,
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null); // Estado para o Pet selecionado
+
+  // Lógica de filtro para a busca
+  const filteredPacientes = mockPacientes.filter(
+    pet =>
+      pet.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pet.cliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pet.id.toLowerCase().includes(searchTerm.toLowerCase()),
   );
-  const [termoBusca, setTermoBusca] = useState('');
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<NovaEntradaFormData>({
-    resolver: zodResolver(novaEntradaSchema),
-  });
-
-  // Função de Busca
-  function handleBuscarPet() {
-    const termo = termoBusca.trim().toLowerCase();
-    if (!termo) {
-      setPetEncontrado(null);
-      return;
-    }
-
-    // Simula a busca: encontra o pet pelo nome ou pelo nome do cliente
-    const encontrado = mockProntuarios.find(
-      pet =>
-        pet.nome.toLowerCase() === termo ||
-        pet.cliente.toLowerCase().includes(termo),
-    );
-
-    setPetEncontrado(encontrado || null);
-  }
-
-  // Função para adicionar nova entrada ao histórico (Simulação)
-  function handleAddEntrada(data: NovaEntradaFormData) {
-    if (!petEncontrado) {
-      alert('Selecione um pet antes de adicionar uma entrada.');
-      return;
-    }
-
-    const novaEntrada: ProntuarioEntrada = {
-      id: uuidv4(),
-      ...data,
-    };
-
-    // Lógica para adicionar a nova entrada ao histórico do pet encontrado
-    // chamada de API (POST)
-    console.log(
-      'Nova Entrada Salva para o Pet:',
-      petEncontrado.nome,
-      novaEntrada,
-    );
-
-    const novoProntuario: PetProntuario = {
-      ...petEncontrado,
-      historico: [novaEntrada, ...petEncontrado.historico],
-    };
-    setPetEncontrado(novoProntuario);
-
+  const handleEdit = (pet: Pet) => {
     alert(
-      `Entrada de prontuário salva com sucesso para ${petEncontrado.nome}!`,
+      `Abrindo formulário de edição para o Pet: ${pet.nome} (Cliente: ${pet.cliente}). Você seria levado para uma página de edição.`,
     );
-    reset();
-  }
+  };
+
+  // Função que SELECIONA o Pet e abre a visualização detalhada
+  const handleViewProntuario = (pet: Pet) => {
+    setSelectedPet(pet);
+  };
+
+  // Função para fechar a visualização detalhada
+  const handleCloseProntuario = () => {
+    setSelectedPet(null);
+  };
 
   return (
-    <div className='p-8 bg-gray-50 min-h-screen'>
-      <div className='max-w-4xl mx-auto'>
-        <h1 className='text-4xl font-extrabold text-center text-pink-600 mb-2 border-b-2 border-yellow-400 pb-2'>
+    <div className='p-8 bg-gray-50 min-h-[calc(100vh-150px)] flex justify-center items-start'>
+      <div className='container max-w-5xl w-full'>
+        {/* TÍTULO H1 */}
+        <h1 className='text-3xl font-extrabold text-center text-pink-600 mb-6 border-b-2 border-yellow-400 pb-2 flex items-center justify-center gap-2'>
+          <ClipboardList size={30} />
           Gerenciamento de Prontuários
         </h1>
-        <p className='text-center text-gray-500 mb-10 text-xl font-medium flex items-center justify-center gap-2'>
-          <FileText size={20} className='text-gray-400' />
-          Histórico clínico e de atendimentos dos pacientes
+        <p className='text-center text-gray-500 mb-8'>
+          Busque um paciente para visualizar seu histórico ou editar seu
+          cadastro.
         </p>
 
-        <section className='p-6 bg-white rounded-xl shadow-lg border-t-4 border-pink-500 mb-8'>
-          <h2 className='text-2xl font-bold text-pink-600 mb-4 flex items-center gap-3'>
-            <Search size={24} />
-            Buscar Prontuário
+        {/* --- 1. SEÇÃO DE BUSCA E LISTAGEM DE PACIENTES --- */}
+        <section
+          className={`bg-white p-6 rounded-xl shadow-lg border-t-4 border-cyan-500 ${
+            selectedPet ? 'mb-4' : 'mb-8'
+          }`}
+        >
+          <h2 className='text-2xl font-bold text-cyan-700 mb-4 flex items-center gap-2 border-b border-cyan-100 pb-2'>
+            <PawPrint size={24} /> Listagem de Pacientes
           </h2>
-          <div className='flex gap-3'>
+
+          {/* CAMPO DE BUSCA */}
+          <div className='mb-6 relative'>
             <input
               type='text'
-              value={termoBusca}
-              onChange={e => setTermoBusca(e.target.value)}
-              placeholder='Buscar por Nome do Pet ou Cliente...'
-              className='flex-1 p-3 border border-gray-300 rounded focus:border-pink-500 focus:ring-1 focus:ring-pink-500'
+              placeholder='Buscar por Nome do Pet, Nome do Cliente ou ID...'
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className='w-full p-3 pl-10 border-2 border-cyan-300 rounded-lg focus:border-cyan-500 focus:ring-cyan-500 transition'
+              disabled={!!selectedPet} // Desabilita a busca ao ver o prontuário
             />
-            <button
-              onClick={handleBuscarPet}
-              className='p-3 bg-pink-500 text-white rounded font-semibold hover:bg-pink-600 transition min-w-[120px]'
-            >
-              Buscar
-            </button>
+            <Search
+              size={20}
+              className='absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-500'
+            />
+          </div>
+
+          {/* TABELA DE PACIENTES */}
+          <div className='overflow-x-auto shadow-md rounded-lg border border-gray-100'>
+            <table className='min-w-full divide-y divide-gray-200'>
+              {/* ... (cabeçalho da tabela) ... */}
+              <thead className='bg-cyan-50'>
+                <tr>
+                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Pet / Cliente
+                  </th>
+                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell'>
+                    Espécie / Raça
+                  </th>
+                  <th className='px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Ações
+                  </th>
+                </tr>
+              </thead>
+              <tbody className='bg-white divide-y divide-gray-200'>
+                {filteredPacientes.length > 0 ? (
+                  filteredPacientes.map(pet => (
+                    <tr key={pet.id} className='hover:bg-gray-50 transition'>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900'>
+                        <div className='flex items-center gap-2'>
+                          <PawPrint size={16} className='text-pink-500' />
+                          <div>
+                            <div className='font-bold'>
+                              {pet.nome}{' '}
+                              <span className='text-xs text-gray-500 ml-1'>
+                                ({pet.id})
+                              </span>
+                            </div>
+                            <div className='text-gray-500 text-xs flex items-center gap-1'>
+                              <User size={12} /> {pet.cliente}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-700 hidden sm:table-cell'>
+                        {pet.especie} {pet.raca && `(${pet.raca})`}
+                      </td>
+                      <td className='px-6 py-4 whitespace-nowrap text-center text-sm font-medium'>
+                        <div className='flex flex-col sm:flex-row gap-2 justify-center'>
+                          {/* Botão para ABRIR PRONTUÁRIO */}
+                          <button
+                            onClick={() => handleViewProntuario(pet)}
+                            className='p-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 transition flex items-center justify-center gap-1 text-xs sm:text-sm'
+                            title='Visualizar Prontuário'
+                            disabled={selectedPet?.id === pet.id}
+                          >
+                            <FileText size={16} /> Prontuário
+                          </button>
+
+                          {/* Botão para EDITAR CADASTRO */}
+                          <button
+                            onClick={() => handleEdit(pet)}
+                            className='p-2 bg-yellow-400 text-gray-800 rounded-md hover:bg-yellow-500 transition flex items-center justify-center gap-1 text-xs sm:text-sm'
+                            title='Editar Cadastro do Cliente e Pet'
+                          >
+                            <Edit size={16} /> Editar
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={3}
+                      className='px-6 py-4 text-center text-gray-500 italic'
+                    >
+                      Nenhum paciente encontrado.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </section>
 
-        {petEncontrado ? (
-          <div>
-            <section className='p-6 bg-white rounded-xl shadow-lg border-t-4 border-cyan-500 mb-8'>
-              <h2 className='text-2xl font-bold text-cyan-600 mb-4 flex items-center gap-3'>
-                <FileText size={24} />
-                Prontuário de {petEncontrado.nome}
-              </h2>
-              <div className='grid grid-cols-2 gap-x-6 gap-y-2 text-gray-700'>
-                <p>
-                  <span className='font-semibold'>Cliente:</span>{' '}
-                  {petEncontrado.cliente}
-                </p>
-                <p>
-                  <span className='font-semibold'>Espécie:</span>{' '}
-                  {petEncontrado.especie}
-                </p>
-                <p>
-                  <span className='font-semibold'>Raça:</span>{' '}
-                  {petEncontrado.raca}
-                </p>
-                {/* Adicionar outros detalhes aqui se necessário */}
-              </div>
-            </section>
-
-            <section className='p-6 bg-white rounded-xl shadow-lg border-t-4 border-cyan-500 mb-8'>
-              <h2 className='text-2xl font-bold text-cyan-600 mb-4 flex items-center gap-3'>
-                <PlusCircle size={24} />
-                Registrar Nova Entrada de Atendimento
-              </h2>
-              <form
-                onSubmit={handleSubmit(handleAddEntrada)}
-                className='space-y-4'
-              >
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                  <div className='form-group'>
-                    <label
-                      htmlFor='data'
-                      className='block font-semibold text-gray-700'
-                    >
-                      Data
-                    </label>
-                    <input
-                      type='date'
-                      id='data'
-                      {...register('data')}
-                      className='p-2 border border-gray-300 rounded w-full'
-                    />
-                    {errors.data && (
-                      <p className='text-red-500 text-sm mt-1'>
-                        {errors.data.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className='form-group'>
-                    <label
-                      htmlFor='medico'
-                      className='block font-semibold text-gray-700'
-                    >
-                      Médico Veterinário
-                    </label>
-                    <input
-                      type='text'
-                      id='medico'
-                      {...register('medico')}
-                      placeholder='Ex: Dr. João'
-                      className='p-2 border border-gray-300 rounded w-full'
-                    />
-                    {errors.medico && (
-                      <p className='text-red-500 text-sm mt-1'>
-                        {errors.medico.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className='form-group'>
-                    <label
-                      htmlFor='tipo'
-                      className='block font-semibold text-gray-700'
-                    >
-                      Tipo de Atendimento
-                    </label>
-                    <select
-                      id='tipo'
-                      {...register('tipo')}
-                      className='p-2 border border-gray-300 rounded w-full bg-white'
-                    >
-                      <option value='consulta'>Consulta</option>
-                      <option value='exame'>Exame/Diagnóstico</option>
-                      <option value='cirurgia'>Cirurgia</option>
-                      <option value='outro'>Outro</option>
-                    </select>
-                    {errors.tipo && (
-                      <p className='text-red-500 text-sm mt-1'>
-                        {errors.tipo.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className='form-group'>
-                  <label
-                    htmlFor='descricao'
-                    className='block font-semibold text-gray-700'
-                  >
-                    Descrição do Atendimento
-                  </label>
-                  <textarea
-                    id='descricao'
-                    {...register('descricao')}
-                    rows={4}
-                    placeholder='Descreva o diagnóstico, procedimentos e prescrições...'
-                    className='p-2 border border-gray-300 rounded w-full'
-                  ></textarea>
-                  {errors.descricao && (
-                    <p className='text-red-500 text-sm mt-1'>
-                      {errors.descricao.message}
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  type='submit'
-                  className='p-3 bg-cyan-500 text-white rounded font-semibold hover:bg-cyan-600 transition w-full flex items-center justify-center gap-2'
-                >
-                  <FileText size={20} />
-                  Salvar Entrada no Prontuário
-                </button>
-              </form>
-            </section>
-
-            {/* --- HISTÓRICO DE ENTRADAS --- */}
-            <section className='p-6 bg-white rounded-xl shadow-lg border-t-4 border-gray-400'>
-              <h2 className='text-2xl font-bold text-gray-600 mb-6 flex items-center gap-3'>
-                Histórico de Atendimentos
-              </h2>
-              <div className='space-y-4'>
-                {petEncontrado.historico.length > 0 ? (
-                  petEncontrado.historico.map(entrada => (
-                    <EntradaHistoricoCard key={entrada.id} entrada={entrada} />
-                  ))
-                ) : (
-                  <p className='text-center text-gray-500 p-8 bg-gray-100 rounded-md'>
-                    Nenhuma entrada encontrada neste prontuário.
-                  </p>
-                )}
-              </div>
-            </section>
-          </div>
-        ) : (
-          <div className='p-12 bg-white rounded-xl shadow-lg border-t-4 border-pink-500 mb-8 text-center'>
-            <FileText size={48} className='text-gray-300 mx-auto mb-4' />
-            <p className='text-xl text-gray-600 font-semibold'>
-              Use o campo de busca acima para encontrar um prontuário pelo nome
-              do Pet ou do Cliente.
-            </p>
-          </div>
+        {/* --- 2. SEÇÃO DE PRONTUÁRIO DETALHADO (Aparece ao selecionar um Pet) --- */}
+        {selectedPet && (
+          <ProntuarioDetalhes
+            pet={selectedPet}
+            onClose={handleCloseProntuario}
+          />
         )}
       </div>
     </div>
