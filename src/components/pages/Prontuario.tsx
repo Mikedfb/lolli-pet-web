@@ -104,7 +104,7 @@ const mockPacientes: Pet[] = [
   },
 ];
 
-// --- NOVO COMPONENTE: MODAL PARA ADICIONAR HISTÓRICO ---
+// ---  ADICIONAR HISTÓRICO ---
 
 interface AdicionarHistoricoModalProps {
   pet: Pet;

@@ -24,7 +24,7 @@ export function Home() {
 
           {/* Botões */}
           <div className='flex justify-center gap-6'>
-            {/* CORRIGIDO: Botão Rosa adaptado */}
+            {/*  Botão Rosa adaptado */}
             <Link
               to='/agendamento-clinico'
               className='px-6 py-3 bg-pink-500 dark:bg-pink-600 text-white text-md font-bold rounded-full shadow-md hover:bg-pink-600 dark:hover:bg-pink-700 transition duration-300 transform hover:scale-105'
@@ -54,7 +54,7 @@ export function Home() {
           {/* Grid dos Cards */}
           <div className='grid md:grid-cols-3 gap-8'>
             {/* Card 1: Clínico (Ciano) */}
-            {/* CORRIGIDO: Fundo, Sombra e Borda adaptados */}
+            {/* Fundo, Sombra e Borda adaptados */}
             <article className='p-8 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border-t-8 border-cyan-500 dark:border-cyan-600 text-center transform hover:shadow-cyan-300/50 dark:hover:shadow-cyan-800/50 hover:shadow-xl transition duration-300'>
               {/* Ícone: Fundo e Cor adaptados */}
               <span className='inline-flex items-center justify-center p-4 rounded-full bg-cyan-100 dark:bg-cyan-900 mb-4'>

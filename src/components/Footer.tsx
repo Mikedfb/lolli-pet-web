@@ -26,7 +26,7 @@ export function Footer() {
           <div className='grid md:grid-cols-3 gap-8 text-center'>
             {/* Card 1 */}
             {/*  Fundo, sombra e borda adaptados */}
-            <article className='p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-2xl border-t-4 border-pink-400 transform hover:scale-[1.02] transition duration-300'>
+            <article className='p-8 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border-t-8 border-cyan-500 dark:border-cyan-600 text-center transform hover:shadow-cyan-300/50 dark:hover:shadow-cyan-800/50 hover:shadow-xl transition duration-300'>
               {/* Ícone: Fundo e Cor adaptados */}
               <span className='inline-flex items-center justify-center p-3 rounded-full bg-pink-100 dark:bg-pink-900 mb-4'>
                 <HeartPulseIcon
@@ -45,7 +45,7 @@ export function Footer() {
             </article>
 
             {/* Card 2 */}
-            <article className='p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-2xl border-t-4 border-cyan-400 transform hover:scale-[1.02] transition duration-300'>
+            <article className='p-8 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border-t-8 border-pink-500 dark:border-pink-600 text-center transform hover:shadow-pink-300/50 dark:hover:shadow-pink-800/50 hover:shadow-xl transition duration-300'>
               <span className='inline-flex items-center justify-center p-3 rounded-full bg-cyan-100 dark:bg-cyan-900 mb-4'>
                 <UserRoundCheckIcon
                   className='text-cyan-600 dark:text-cyan-300'
@@ -61,7 +61,7 @@ export function Footer() {
             </article>
 
             {/* Card 3 */}
-            <article className='p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-2xl border-t-4 border-yellow-400 transform hover:scale-[1.02] transition duration-300'>
+            <article className='p-8 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border-t-8 border-yellow-500 dark:border-yellow-600 text-center transform hover:shadow-yellow-300/50 dark:hover:shadow-yellow-800/50 hover:shadow-xl transition duration-300'>
               <span className='inline-flex items-center justify-center p-3 rounded-full bg-yellow-100 dark:bg-yellow-900 mb-4'>
                 <LaughIcon
                   className='text-yellow-600 dark:text-yellow-300'
