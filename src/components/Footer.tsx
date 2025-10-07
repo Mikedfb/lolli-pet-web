@@ -14,7 +14,7 @@ export function Footer() {
     // Container principal: Adiciona transição de cor para suavidade
     <div className='w-full transition-colors duration-500'>
       {/* 1. Seção de Valores */}
-      {/* CORRIGIDO: Fundo, borda e transição para Dark Mode */}
+      {/*  Fundo, borda e transição para Dark Mode */}
       <section className='bg-gray-50 dark:bg-gray-900 py-12 px-5 border-t border-yellow-300 dark:border-yellow-600 transition-colors duration-500'>
         <div className='max-w-7xl mx-auto'>
           {/* Título: Cores Light e Dark */}
@@ -25,7 +25,7 @@ export function Footer() {
           {/* Cards de Valor */}
           <div className='grid md:grid-cols-3 gap-8 text-center'>
             {/* Card 1 */}
-            {/* CORRIGIDO: Fundo, sombra e borda adaptados */}
+            {/*  Fundo, sombra e borda adaptados */}
             <article className='p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-2xl border-t-4 border-pink-400 transform hover:scale-[1.02] transition duration-300'>
               {/* Ícone: Fundo e Cor adaptados */}
               <span className='inline-flex items-center justify-center p-3 rounded-full bg-pink-100 dark:bg-pink-900 mb-4'>
@@ -81,7 +81,7 @@ export function Footer() {
       </section>
 
       {/* 2. Rodapé de Contato/Copyright */}
-      {/* CORRIGIDO: Fundo e Texto principal do rodapé adaptados */}
+      {/*  Fundo e Texto principal do rodapé adaptados */}
       <footer className='bg-gray-800 dark:bg-gray-950 text-white dark:text-gray-300 py-8 px-5 transition-colors duration-500'>
         {/* Borda de separação adaptada */}
         <div className='max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 border-b border-gray-700 dark:border-gray-600 pb-6 mb-6'>

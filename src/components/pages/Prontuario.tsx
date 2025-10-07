@@ -8,10 +8,13 @@ import {
   Calendar,
   Paperclip,
   PlusCircle,
+  X,
+  Send,
+  Loader,
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-// --- INTERFACES DE DADOS (Mock) ---
+// --- INTERFACES DE DADOS ---
 
 interface HistoricoEntry {
   id: string;
@@ -101,17 +104,229 @@ const mockPacientes: Pet[] = [
   },
 ];
 
-// --- COMPONENTE DETALHES DO PRONTUÁRIO ---
+// --- NOVO COMPONENTE: MODAL PARA ADICIONAR HISTÓRICO ---
+
+interface AdicionarHistoricoModalProps {
+  pet: Pet;
+  onClose: () => void;
+  onSave: (entry: Omit<HistoricoEntry, 'id'>) => void; // A ser usado no Backend
+}
+
+const TIPOS_ATENDIMENTO = [
+  'Consulta',
+  'Exame',
+  'Vacina',
+  'Banho',
+  'Tosa',
+  'Outro',
+];
+
+const AdicionarHistoricoModal: React.FC<AdicionarHistoricoModalProps> = ({
+  pet,
+  onClose,
+  onSave,
+}) => {
+  const [data, setData] = useState(new Date().toISOString().substring(0, 10)); // Data atual por padrão
+  const [tipo, setTipo] = useState<HistoricoEntry['tipo']>('Consulta');
+  const [descricao, setDescricao] = useState('');
+  const [responsavel, setResponsavel] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  // A ser substituída pela função de upload real
+  const handleFileUpload = () => {
+    console.log('[Simulação] Seleção de arquivo de imagem/PDF aberta.');
+    // Aqui estaria a lógica de upload para o Storage
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!descricao || !responsavel) {
+      console.warn('Preencha a descrição e o responsável.');
+      return;
+    }
+
+    setIsSaving(true);
+
+    const newEntry: Omit<HistoricoEntry, 'id'> = {
+      data: new Date(data).toLocaleDateString('pt-BR'), // Converte YYYY-MM-DD para DD/MM/AAAA
+      tipo,
+      descricao,
+      responsavel,
+      arquivos: [], // Arquivos seriam adicionados aqui após upload
+    };
+
+    // SIMULAÇÃO: No ambiente real, essa função chamaria a API (POST /api/historico)
+    setTimeout(() => {
+      onSave(newEntry);
+      setIsSaving(false);
+      onClose();
+      console.log(`[Simulação] Nova entrada salva para o Pet ${pet.nome}`);
+    }, 1500);
+  };
+
+  return (
+    // Modal Overlay (Fundo Escuro)
+    <div className='fixed inset-0 bg-black bg-opacity-70 z-50 flex justify-center items-center backdrop-blur-sm'>
+      {/* Conteúdo do Modal */}
+      <div className='bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl w-full max-w-lg transition-all transform scale-100 border-t-4 border-pink-500'>
+        <div className='flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-3 mb-4'>
+          <h3 className='text-xl font-bold text-pink-700 dark:text-pink-400 flex items-center gap-2'>
+            <FileText size={20} /> Novo Atendimento - {pet.nome}
+          </h3>
+          <button
+            onClick={onClose}
+            className='p-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition'
+            title='Fechar'
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className='space-y-4'>
+          {/* Campo Data e Tipo */}
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+            <div>
+              <label
+                htmlFor='data'
+                className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'
+              >
+                Data
+              </label>
+              <input
+                id='data'
+                type='date'
+                value={data}
+                onChange={e => setData(e.target.value)}
+                required
+                className='w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-cyan-500 focus:border-cyan-500'
+                max={new Date().toISOString().substring(0, 10)}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor='tipo'
+                className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'
+              >
+                Tipo de Serviço
+              </label>
+              <select
+                id='tipo'
+                value={tipo}
+                onChange={e =>
+                  setTipo(e.target.value as HistoricoEntry['tipo'])
+                }
+                required
+                className='w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-cyan-500 focus:border-cyan-500'
+              >
+                {TIPOS_ATENDIMENTO.map(t => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Campo Responsável */}
+          <div>
+            <label
+              htmlFor='responsavel'
+              className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'
+            >
+              Veterinário / Responsável
+            </label>
+            <input
+              id='responsavel'
+              type='text'
+              value={responsavel}
+              onChange={e => setResponsavel(e.target.value)}
+              required
+              placeholder='Nome do profissional'
+              className='w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-cyan-500 focus:border-cyan-500'
+            />
+          </div>
+
+          {/* Campo Descrição */}
+          <div>
+            <label
+              htmlFor='descricao'
+              className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'
+            >
+              Descrição Detalhada do Atendimento
+            </label>
+            <textarea
+              id='descricao'
+              rows={4}
+              value={descricao}
+              onChange={e => setDescricao(e.target.value)}
+              required
+              placeholder='Diagnóstico, procedimentos realizados, medicamentos, etc.'
+              className='w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-cyan-500 focus:border-cyan-500'
+            ></textarea>
+          </div>
+
+          {/* Botão para Anexar Arquivos (Simulado) */}
+          <div className='flex justify-between items-center pt-2'>
+            <button
+              type='button'
+              onClick={handleFileUpload}
+              className='flex items-center gap-2 p-2 text-xs font-semibold text-yellow-700 dark:text-yellow-300 bg-yellow-100 dark:bg-yellow-900/50 rounded-md hover:bg-yellow-200 dark:hover:bg-yellow-800/50 transition disabled:opacity-50'
+              disabled={isSaving}
+            >
+              <Paperclip size={16} /> Anexar Imagem/PDF (Opcional)
+            </button>
+            <span className='text-xs text-gray-500 dark:text-gray-400 italic'>
+              Max 10MB por anexo.
+            </span>
+          </div>
+
+          {/* Botões de Ação */}
+          <div className='flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700'>
+            <button
+              type='button'
+              onClick={onClose}
+              className='p-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition disabled:opacity-50'
+              disabled={isSaving}
+            >
+              Cancelar
+            </button>
+            <button
+              type='submit'
+              className='p-2 bg-cyan-600 text-white font-bold rounded-md hover:bg-cyan-700 transition flex items-center justify-center gap-2 disabled:bg-cyan-800 disabled:cursor-not-allowed'
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <Loader size={20} className='animate-spin' /> Salvando...
+                </>
+              ) : (
+                <>
+                  <Send size={20} /> Salvar Histórico
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// --- COMPONENTE DETALHES DO PRONTUÁRIO (Atualizado para abrir o Modal) ---
 
 interface ProntuarioDetalhesProps {
   pet: Pet;
   onClose: () => void;
+  onAddHistorico: (entry: Omit<HistoricoEntry, 'id'>) => void;
 }
 
 const ProntuarioDetalhes: React.FC<ProntuarioDetalhesProps> = ({
   pet,
   onClose,
+  onAddHistorico,
 }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   // Ordena o histórico pela data (mais recente primeiro)
   const historicoOrdenado = [...pet.historico].sort((a, b) => {
     // Converte a data DD/MM/AAAA para AAAA-MM-DD para comparação
@@ -119,15 +334,6 @@ const ProntuarioDetalhes: React.FC<ProntuarioDetalhesProps> = ({
     const dateB = new Date(b.data.split('/').reverse().join('-')).getTime();
     return dateB - dateA;
   });
-
-  // Simula o Anexo de Arquivo
-  const handleAnexarArquivo = () => {
-    // Substituído alert() por console.log()
-    console.log(
-      `[Simulação] Abrindo seletor de arquivos para anexar um novo documento ao Pet ${pet.nome}.`,
-    );
-    // Aqui seria a lógica de upload e atualização do histórico.
-  };
 
   return (
     // Estilo adaptado para Dark Mode
@@ -159,6 +365,9 @@ const ProntuarioDetalhes: React.FC<ProntuarioDetalhesProps> = ({
         </p>
         <p>
           <strong>Cliente:</strong> {pet.cliente}
+        </p>
+        <p className='col-span-2 md:col-span-4'>
+          <strong>Telefone:</strong> {pet.telefone}
         </p>
       </div>
 
@@ -231,28 +440,63 @@ const ProntuarioDetalhes: React.FC<ProntuarioDetalhesProps> = ({
         )}
       </div>
 
-      {/* BOTÃO PARA ANEXAR ARQUIVOS */}
+      {/* BOTÃO PARA ADICIONAR NOVO HISTÓRICO (AGORA ABRE O MODAL) */}
       <div className='mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 text-center'>
         <button
-          onClick={handleAnexarArquivo}
+          onClick={() => setIsModalOpen(true)}
           // Botão adaptado para Dark Mode
           className='p-3 bg-cyan-500 dark:bg-cyan-600 text-white font-bold rounded-md hover:bg-cyan-600 dark:hover:bg-cyan-700 transition flex items-center justify-center gap-2 mx-auto'
         >
-          <PlusCircle size={20} /> Anexar Novo Arquivo/Imagem
+          <PlusCircle size={20} /> Adicionar Novo Atendimento
         </button>
       </div>
+
+      {/* RENDERIZAÇÃO DO MODAL */}
+      {isModalOpen && (
+        <AdicionarHistoricoModal
+          pet={pet}
+          onClose={() => setIsModalOpen(false)}
+          onSave={onAddHistorico}
+        />
+      )}
     </div>
   );
 };
 
 // --- COMPONENTE PRINCIPAL (PRONTUÁRIO) ---
-// FIX: Renomeado para App e alterado para exportação padrão para funcionar no ambiente de ficheiro único.
+
 export default function App() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedPet, setSelectedPet] = useState<Pet | null>(null); // Estado para o Pet selecionado
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
 
-  // Lógica de filtro para a busca
-  const filteredPacientes = mockPacientes.filter(
+  // ESTADOS PARA GESTÃO DE DADOS (serão substituídos pela API)
+  const [pacientes, setPacientes] = useState<Pet[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // SIMULAÇÃO DE BUSCA DE DADOS
+  useEffect(() => {
+    const fetchData = () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        // Simular um atraso de 1 segundo (latência de rede)
+        setTimeout(() => {
+          setPacientes(mockPacientes);
+          setIsLoading(false);
+        }, 1000);
+      } catch (err) {
+        setError('Falha ao carregar dados dos pacientes.');
+        setIsLoading(false);
+        console.error(err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Lógica de filtro
+  const filteredPacientes = pacientes.filter(
     pet =>
       pet.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
       pet.cliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -260,32 +504,56 @@ export default function App() {
   );
 
   const handleEdit = (pet: Pet) => {
-    // Substituído alert() por console.log()
+    // A ser implementado: Abre o formulário de edição do cadastro
     console.log(
-      `[Simulação] Abrindo formulário de edição para o Pet: ${pet.nome} (Cliente: ${pet.cliente}).`,
+      `[Simulação] Abrindo formulário de edição para o Pet: ${pet.nome}.`,
     );
   };
 
-  // Função que SELECIONA o Pet e abre a visualização detalhada
   const handleViewProntuario = (pet: Pet) => {
     setSelectedPet(pet);
   };
 
-  // Função para fechar a visualização detalhada
   const handleCloseProntuario = () => {
     setSelectedPet(null);
+  };
+
+  // NOVA FUNÇÃO: Adiciona a entrada ao histórico (SIMULAÇÃO DE FRONTEND)
+  const handleAddHistorico = (newEntry: Omit<HistoricoEntry, 'id'>) => {
+    if (!selectedPet) return;
+
+    // Simulação de adição de ID único (necessário no frontend mockado)
+    const entryWithId = { ...newEntry, id: `H${Date.now()}` };
+
+    // Cria uma cópia da lista de pacientes e encontra o pet
+    setPacientes(prevPacientes =>
+      prevPacientes.map(pet =>
+        pet.id === selectedPet.id
+          ? { ...pet, historico: [...pet.historico, entryWithId] }
+          : pet,
+      ),
+    );
+
+    // Atualiza o pet selecionado para que os detalhes sejam atualizados instantaneamente
+    setSelectedPet(prevPet =>
+      prevPet
+        ? { ...prevPet, historico: [...prevPet.historico, entryWithId] }
+        : null,
+    );
+
+    // No backend real, esta função chamaria a API POST e o onSnapshot faria a atualização.
   };
 
   return (
     // Container principal com Dark Mode
     <div className='p-8 bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-150px)] flex justify-center items-start transition-colors duration-500'>
       <div className='container max-w-5xl w-full'>
-        {/* TÍTULO H1 adaptado */}
+        {/* TÍTULO H1 */}
         <h1 className='text-3xl font-extrabold text-center text-pink-600 dark:text-pink-400 mb-6 border-b-2 border-yellow-400 dark:border-yellow-600 pb-2 flex items-center justify-center gap-2'>
           <ClipboardList size={30} />
           Gerenciamento de Prontuários
         </h1>
-        {/* Descrição adaptada */}
+        {/* Descrição */}
         <p className='text-center text-gray-500 dark:text-gray-400 mb-8'>
           Busque um paciente para visualizar seu histórico ou editar seu
           cadastro.
@@ -297,12 +565,12 @@ export default function App() {
             selectedPet ? 'mb-4' : 'mb-8'
           } transition-colors duration-500`}
         >
-          {/* Título da seção adaptado */}
+          {/* Título da seção */}
           <h2 className='text-2xl font-bold text-cyan-700 dark:text-cyan-400 mb-4 flex items-center gap-2 border-b border-cyan-100 dark:border-gray-700 pb-2'>
             <PawPrint size={24} /> Listagem de Pacientes
           </h2>
 
-          {/* CAMPO DE BUSCA adaptado */}
+          {/* CAMPO DE BUSCA */}
           <div className='mb-6 relative'>
             <input
               type='text'
@@ -310,7 +578,7 @@ export default function App() {
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className='w-full p-3 pl-10 border-2 border-cyan-300 dark:border-cyan-700 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-cyan-500 transition'
-              disabled={!!selectedPet} // Desabilita a busca ao ver o prontuário
+              disabled={!!selectedPet || isLoading || !!error}
             />
             <Search
               size={20}
@@ -321,7 +589,7 @@ export default function App() {
           {/* TABELA DE PACIENTES */}
           <div className='overflow-x-auto shadow-md rounded-lg border border-gray-100 dark:border-gray-700'>
             <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
-              {/* Cabeçalho da tabela adaptado */}
+              {/* Cabeçalho da tabela */}
               <thead className='bg-cyan-50 dark:bg-gray-700'>
                 <tr>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'>
@@ -335,67 +603,116 @@ export default function App() {
                   </th>
                 </tr>
               </thead>
-              {/* Corpo da tabela adaptado */}
+              {/* Corpo da tabela */}
               <tbody className='bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700'>
-                {filteredPacientes.length > 0 ? (
-                  filteredPacientes.map(pet => (
-                    <tr
-                      key={pet.id}
-                      className='hover:bg-gray-50 dark:hover:bg-gray-700 transition'
-                    >
-                      <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100'>
-                        <div className='flex items-center gap-2'>
-                          <PawPrint size={16} className='text-pink-500' />
-                          <div>
-                            <div className='font-bold'>
-                              {pet.nome}{' '}
-                              <span className='text-xs text-gray-500 dark:text-gray-400 ml-1'>
-                                ({pet.id})
-                              </span>
-                            </div>
-                            <div className='text-gray-500 dark:text-gray-400 text-xs flex items-center gap-1'>
-                              <User size={12} /> {pet.cliente}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 hidden sm:table-cell'>
-                        {pet.especie} {pet.raca && `(${pet.raca})`}
-                      </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-center text-sm font-medium'>
-                        <div className='flex flex-col sm:flex-row gap-2 justify-center'>
-                          {/* Botão para ABRIR PRONTUÁRIO */}
-                          <button
-                            onClick={() => handleViewProntuario(pet)}
-                            className='p-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 transition flex items-center justify-center gap-1 text-xs sm:text-sm disabled:bg-pink-700'
-                            title='Visualizar Prontuário'
-                            disabled={selectedPet?.id === pet.id}
-                          >
-                            <FileText size={16} /> Prontuário
-                          </button>
-
-                          {/* Botão para EDITAR CADASTRO */}
-                          <button
-                            onClick={() => handleEdit(pet)}
-                            className='p-2 bg-yellow-400 text-gray-800 rounded-md hover:bg-yellow-500 transition flex items-center justify-center gap-1 text-xs sm:text-sm'
-                            title='Editar Cadastro do Cliente e Pet'
-                          >
-                            <Edit size={16} /> Editar
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
+                {isLoading && (
                   <tr>
                     <td
                       colSpan={3}
-                      className='px-6 py-4 text-center text-gray-500 dark:text-gray-400 italic'
+                      className='px-6 py-8 text-center text-cyan-600 dark:text-cyan-400 font-semibold'
                     >
-                      Nenhum paciente encontrado.
+                      <div className='flex items-center justify-center gap-3'>
+                        <svg
+                          className='animate-spin h-5 w-5 text-cyan-500'
+                          xmlns='http://www.w3.org/2000/svg'
+                          fill='none'
+                          viewBox='0 0 24 24'
+                        >
+                          <circle
+                            className='opacity-25'
+                            cx='12'
+                            cy='12'
+                            r='10'
+                            stroke='currentColor'
+                            strokeWidth='4'
+                          ></circle>
+                          <path
+                            className='opacity-75'
+                            fill='currentColor'
+                            d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                          ></path>
+                        </svg>
+                        A carregar pacientes...
+                      </div>
                     </td>
                   </tr>
                 )}
+
+                {error && (
+                  <tr>
+                    <td
+                      colSpan={3}
+                      className='px-6 py-8 text-center text-red-600 dark:text-red-400 font-semibold'
+                    >
+                      Erro ao carregar os dados: {error}
+                    </td>
+                  </tr>
+                )}
+
+                {!isLoading && !error && filteredPacientes.length > 0
+                  ? // Map the filteredPacientes
+                    filteredPacientes.map(pet => (
+                      <tr
+                        key={pet.id}
+                        className='hover:bg-gray-50 dark:hover:bg-gray-700 transition'
+                      >
+                        <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100'>
+                          <div className='flex items-center gap-2'>
+                            <PawPrint size={16} className='text-pink-500' />
+                            <div>
+                              <div className='font-bold'>
+                                {pet.nome}{' '}
+                                <span className='text-xs text-gray-500 dark:text-gray-400 ml-1'>
+                                  ({pet.id})
+                                </span>
+                              </div>
+                              <div className='text-gray-500 dark:text-gray-400 text-xs flex items-center gap-1'>
+                                <User size={12} /> {pet.cliente}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 hidden sm:table-cell'>
+                          {pet.especie} {pet.raca && `(${pet.raca})`}
+                        </td>
+                        <td className='px-6 py-4 whitespace-nowrap text-center text-sm font-medium'>
+                          <div className='flex flex-col sm:flex-row gap-2 justify-center'>
+                            {/* Botão para ABRIR PRONTUÁRIO */}
+                            <button
+                              onClick={() => handleViewProntuario(pet)}
+                              className='p-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 transition flex items-center justify-center gap-1 text-xs sm:text-sm disabled:bg-pink-700'
+                              title='Visualizar Prontuário'
+                              disabled={selectedPet?.id === pet.id}
+                            >
+                              <FileText size={16} /> Prontuário
+                            </button>
+
+                            {/* Botão para EDITAR CADASTRO */}
+                            <button
+                              onClick={() => handleEdit(pet)}
+                              className='p-2 bg-yellow-400 text-gray-800 rounded-md hover:bg-yellow-500 transition flex items-center justify-center gap-1 text-xs sm:text-sm'
+                              title='Editar Cadastro do Cliente e Pet'
+                            >
+                              <Edit size={16} /> Editar
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  : // Caso de busca Vazia ou Base de Dados Vazia, sem carregamento ou erro
+                    !isLoading &&
+                    !error && (
+                      <tr>
+                        <td
+                          colSpan={3}
+                          className='px-6 py-4 text-center text-gray-500 dark:text-gray-400 italic'
+                        >
+                          {searchTerm
+                            ? 'Nenhum paciente encontrado para a sua busca.'
+                            : 'Nenhum paciente registado na base de dados.'}
+                        </td>
+                      </tr>
+                    )}
               </tbody>
             </table>
           </div>
@@ -406,6 +723,7 @@ export default function App() {
           <ProntuarioDetalhes
             pet={selectedPet}
             onClose={handleCloseProntuario}
+            onAddHistorico={handleAddHistorico} // Passa a nova função de salvar
           />
         )}
       </div>

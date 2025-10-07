@@ -62,7 +62,7 @@ export function AgendamentoClinico() {
   }
 
   return (
-    // CORRIGIDO: Fundo da Página Adaptado
+    // Fundo da Página Adaptado
     <div className='p-8 bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-150px)] flex justify-center items-start transition-colors duration-500'>
       <div className='container max-w-2xl w-full'>
         {/* CORRIGIDO: Título e Borda Adaptados (Ciano) */}
@@ -70,14 +70,14 @@ export function AgendamentoClinico() {
           <StethoscopeIcon size={30} />
           Novo Agendamento Clínico
         </h1>
-        {/* CORRIGIDO: Parágrafo Adaptado */}
+        {/*  Parágrafo Adaptado */}
         <p className='text-center text-gray-500 dark:text-gray-400 mb-8'>
           Preencha os dados do cliente e do pet para agendar uma consulta.
         </p>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          // CORRIGIDO: Fundo e Borda do Formulário Adaptados
+          //  Fundo e Borda do Formulário Adaptados
           className='space-y-6 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700'
         >
           <fieldset className='border-2 border-cyan-500 dark:border-cyan-600 p-4 rounded-md'>
@@ -89,7 +89,7 @@ export function AgendamentoClinico() {
               <div className='form-group'>
                 <label
                   htmlFor='nomeCliente'
-                  // CORRIGIDO: Texto da Label Adaptado
+                  // Texto da Label Adaptado
                   className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
                 >
                   <User
@@ -102,7 +102,7 @@ export function AgendamentoClinico() {
                   type='text'
                   id='nomeCliente'
                   {...register('nomeCliente')}
-                  // CORRIGIDO: Input e Foco Adaptados
+                  //  Input e Foco Adaptados
                   className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-cyan-500 dark:focus:border-cyan-400 dark:bg-gray-700 dark:text-gray-50'
                 />
                 {errors.nomeCliente && (
@@ -115,7 +115,7 @@ export function AgendamentoClinico() {
               <div className='form-group'>
                 <label
                   htmlFor='telefone'
-                  // CORRIGIDO: Texto da Label Adaptado
+                  //  Texto da Label Adaptado
                   className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
                 >
                   <Phone
@@ -129,7 +129,7 @@ export function AgendamentoClinico() {
                   id='telefone'
                   {...register('telefone')}
                   placeholder='(00) 00000-0000'
-                  // CORRIGIDO: Input e Foco Adaptados
+                  //  Input e Foco Adaptados
                   className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-cyan-500 dark:focus:border-cyan-400 dark:bg-gray-700 dark:text-gray-50'
                 />
                 {errors.telefone && (
@@ -149,7 +149,7 @@ export function AgendamentoClinico() {
             <div className='form-group'>
               <label
                 htmlFor='nomePet'
-                // CORRIGIDO: Texto da Label Adaptado
+                //  Texto da Label Adaptado
                 className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
               >
                 <PawPrint
@@ -162,7 +162,7 @@ export function AgendamentoClinico() {
                 type='text'
                 id='nomePet'
                 {...register('nomePet')}
-                // CORRIGIDO: Input e Foco Adaptados
+                //  Input e Foco Adaptados
                 className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-cyan-500 dark:focus:border-cyan-400 dark:bg-gray-700 dark:text-gray-50'
               />
               {errors.nomePet && (
@@ -175,7 +175,7 @@ export function AgendamentoClinico() {
             <div className='form-group'>
               <label
                 htmlFor='servico'
-                // CORRIGIDO: Texto da Label Adaptado
+                // Texto da Label Adaptado
                 className='block font-semibold text-gray-700 dark:text-gray-300'
               >
                 Tipo de Serviço:
@@ -183,7 +183,7 @@ export function AgendamentoClinico() {
               <select
                 id='servico'
                 {...register('servico')}
-                // CORRIGIDO: Select e Foco Adaptados
+                //  Select e Foco Adaptados
                 className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-cyan-500 dark:focus:border-cyan-400 bg-white dark:bg-gray-700 dark:text-gray-50'
               >
                 <option value='consulta'>Consulta de Rotina</option>
@@ -208,7 +208,7 @@ export function AgendamentoClinico() {
               <div className='form-group'>
                 <label
                   htmlFor='data'
-                  // CORRIGIDO: Texto da Label Adaptado
+                  //  Texto da Label Adaptado
                   className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
                 >
                   <CalendarDays
@@ -221,7 +221,7 @@ export function AgendamentoClinico() {
                   type='date'
                   id='data'
                   {...register('data')}
-                  // CORRIGIDO: Input e Foco Adaptados
+                  //  Input e Foco Adaptados
                   className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-cyan-500 dark:focus:border-cyan-400 dark:bg-gray-700 dark:text-gray-50'
                 />
                 {errors.data && (
@@ -234,7 +234,7 @@ export function AgendamentoClinico() {
               <div className='form-group'>
                 <label
                   htmlFor='hora'
-                  // CORRIGIDO: Texto da Label Adaptado
+                  //  Texto da Label Adaptado
                   className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
                 >
                   <Clock
@@ -247,7 +247,7 @@ export function AgendamentoClinico() {
                   type='time'
                   id='hora'
                   {...register('hora')}
-                  // CORRIGIDO: Input e Foco Adaptados
+                  //  Input e Foco Adaptados
                   className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-cyan-500 dark:focus:border-cyan-400 dark:bg-gray-700 dark:text-gray-50'
                 />
                 {errors.hora && (
@@ -262,7 +262,7 @@ export function AgendamentoClinico() {
           <div className='form-group'>
             <label
               htmlFor='observacoes'
-              // CORRIGIDO: Texto da Label Adaptado
+              //  Texto da Label Adaptado
               className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
             >
               <MessageSquare
@@ -276,7 +276,7 @@ export function AgendamentoClinico() {
               rows={3}
               {...register('observacoes')}
               placeholder='Ex: Suspeita de dor na pata traseira. Medicamento de uso contínuo.'
-              // CORRIGIDO: Input e Foco Adaptados
+              //  Input e Foco Adaptados
               className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-cyan-500 dark:focus:border-cyan-400 dark:bg-gray-700 dark:text-gray-50'
             ></textarea>
             {errors.observacoes && (
@@ -288,7 +288,7 @@ export function AgendamentoClinico() {
 
           <button
             type='submit'
-            // CORRIGIDO: Botão e Hover Adaptados
+            //  Botão e Hover Adaptados
             className='w-full p-3 bg-cyan-500 dark:bg-cyan-600 text-white font-bold rounded-md hover:bg-cyan-600 dark:hover:bg-cyan-700 transition'
           >
             Agendar Consulta

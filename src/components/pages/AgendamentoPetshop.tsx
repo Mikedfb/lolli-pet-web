@@ -61,26 +61,26 @@ export function AgendamentoPetshop() {
   }
 
   return (
-    // CORRIGIDO: Fundo da Página Adaptado
+    //  Fundo da Página Adaptado
     <div className='p-8 bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-150px)] flex justify-center items-start transition-colors duration-500'>
       <div className='container max-w-2xl w-full'>
-        {/* CORRIGIDO: Título e Borda Adaptados */}
+        {/*  Título e Borda Adaptados */}
         <h1 className='text-3xl font-extrabold text-center text-pink-600 dark:text-pink-400 mb-6 border-b-2 border-yellow-400 dark:border-yellow-600 pb-2 flex items-center justify-center gap-2'>
           <BathIcon size={30} />
           Novo Agendamento Petshop
         </h1>
-        {/* CORRIGIDO: Parágrafo Adaptado */}
+        {/*  Parágrafo Adaptado */}
         <p className='text-center text-gray-500 dark:text-gray-400 mb-8'>
           Preencha os dados para agendar serviços de banho, tosa e estética.
         </p>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          // CORRIGIDO: Fundo e Borda do Formulário Adaptados
+          //  Fundo e Borda do Formulário Adaptados
           className='space-y-6 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700'
         >
           {/* FIELDSET PRINCIPAL */}
-          {/* CORRIGIDO: Borda e Texto do Fieldset Adaptados */}
+          {/*  Borda e Texto do Fieldset Adaptados */}
           <fieldset className='border-2 border-pink-500 dark:border-pink-600 p-4 rounded-md'>
             <legend className='font-bold text-lg text-pink-700 dark:text-pink-400 px-2'>
               Dados do Cliente
@@ -90,7 +90,7 @@ export function AgendamentoPetshop() {
               <div className='form-group'>
                 <label
                   htmlFor='nomeCliente'
-                  // CORRIGIDO: Texto da Label Adaptado
+                  // Texto da Label Adaptado
                   className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
                 >
                   <User
@@ -103,7 +103,7 @@ export function AgendamentoPetshop() {
                   type='text'
                   id='nomeCliente'
                   {...register('nomeCliente')}
-                  // CORRIGIDO: Input e Foco Adaptados
+                  // Input e Foco Adaptados
                   className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-pink-500 dark:focus:border-pink-400 dark:bg-gray-700 dark:text-gray-50'
                 />
                 {errors.nomeCliente && (
@@ -116,7 +116,7 @@ export function AgendamentoPetshop() {
               <div className='form-group'>
                 <label
                   htmlFor='telefone'
-                  // CORRIGIDO: Texto da Label Adaptado
+                  // Texto da Label Adaptado
                   className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
                 >
                   <Phone
@@ -130,7 +130,7 @@ export function AgendamentoPetshop() {
                   id='telefone'
                   {...register('telefone')}
                   placeholder='(00) 00000-0000'
-                  // CORRIGIDO: Input e Foco Adaptados
+                  // Input e Foco Adaptados
                   className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-pink-500 dark:focus:border-pink-400 dark:bg-gray-700 dark:text-gray-50'
                 />
                 {errors.telefone && (
@@ -144,7 +144,7 @@ export function AgendamentoPetshop() {
 
           {/* DADOS DO PET E SERVIÇO */}
           {/* FIELDSET PRINCIPAL */}
-          {/* CORRIGIDO: Borda e Texto do Fieldset Adaptados */}
+          {/*  Borda e Texto do Fieldset Adaptados */}
           <fieldset className='border-2 border-pink-500 dark:border-pink-600 p-4 rounded-md'>
             <legend className='font-bold text-lg text-pink-700 dark:text-pink-400 px-2'>
               Dados do Pet e Serviço
@@ -153,7 +153,7 @@ export function AgendamentoPetshop() {
             <div className='form-group'>
               <label
                 htmlFor='nomePet'
-                // CORRIGIDO: Texto da Label Adaptado
+                //  Texto da Label Adaptado
                 className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
               >
                 <PawPrint
@@ -166,7 +166,7 @@ export function AgendamentoPetshop() {
                 type='text'
                 id='nomePet'
                 {...register('nomePet')}
-                // CORRIGIDO: Input e Foco Adaptados
+                //  Input e Foco Adaptados
                 className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-pink-500 dark:focus:border-pink-400 dark:bg-gray-700 dark:text-gray-50'
               />
               {errors.nomePet && (
@@ -179,7 +179,7 @@ export function AgendamentoPetshop() {
             <div className='form-group'>
               <label
                 htmlFor='servico'
-                // CORRIGIDO: Texto da Label Adaptado
+                //  Texto da Label Adaptado
                 className='block font-semibold text-gray-700 dark:text-gray-300'
               >
                 Tipo de Serviço:
@@ -187,7 +187,7 @@ export function AgendamentoPetshop() {
               <select
                 id='servico'
                 {...register('servico')}
-                // CORRIGIDO: Select e Foco Adaptados (incluindo o fundo)
+                // Select e Foco Adaptados (incluindo o fundo)
                 className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-pink-500 dark:focus:border-pink-400 bg-white dark:bg-gray-700 dark:text-gray-50'
               >
                 <option value='banho'>Apenas Banho</option>
@@ -206,7 +206,7 @@ export function AgendamentoPetshop() {
 
           {/* DATA E HORA */}
           {/* FIELDSET PRINCIPAL */}
-          {/* CORRIGIDO: Borda e Texto do Fieldset Adaptados */}
+          {/*  Borda e Texto do Fieldset Adaptados */}
           <fieldset className='border-2 border-pink-500 dark:border-pink-600 p-4 rounded-md'>
             <legend className='font-bold text-lg text-pink-700 dark:text-pink-400 px-2'>
               Data e Hora
@@ -216,7 +216,7 @@ export function AgendamentoPetshop() {
               <div className='form-group'>
                 <label
                   htmlFor='data'
-                  // CORRIGIDO: Texto da Label Adaptado
+                  // Texto da Label Adaptado
                   className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
                 >
                   <CalendarDays
@@ -229,7 +229,7 @@ export function AgendamentoPetshop() {
                   type='date'
                   id='data'
                   {...register('data')}
-                  // CORRIGIDO: Input e Foco Adaptados
+                  // Input e Foco Adaptados
                   className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-pink-500 dark:focus:border-pink-400 dark:bg-gray-700 dark:text-gray-50'
                 />
                 {errors.data && (
@@ -242,7 +242,7 @@ export function AgendamentoPetshop() {
               <div className='form-group'>
                 <label
                   htmlFor='hora'
-                  // CORRIGIDO: Texto da Label Adaptado
+                  // Texto da Label Adaptado
                   className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
                 >
                   <Clock
@@ -255,7 +255,7 @@ export function AgendamentoPetshop() {
                   type='time'
                   id='hora'
                   {...register('hora')}
-                  // CORRIGIDO: Input e Foco Adaptados
+                  // Input e Foco Adaptados
                   className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-pink-500 dark:focus:border-pink-400 dark:bg-gray-700 dark:text-gray-50'
                 />
                 {errors.hora && (
@@ -271,7 +271,7 @@ export function AgendamentoPetshop() {
           <div className='form-group'>
             <label
               htmlFor='observacoes'
-              // CORRIGIDO: Texto da Label Adaptado
+              // Texto da Label Adaptado
               className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
             >
               <MessageSquare
@@ -285,7 +285,7 @@ export function AgendamentoPetshop() {
               rows={3}
               {...register('observacoes')}
               placeholder='Ex: Gato persa, porte grande, tosa na máquina baixa.'
-              // CORRIGIDO: Input e Foco Adaptados
+              // Input e Foco Adaptados
               className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-pink-500 dark:focus:border-pink-400 dark:bg-gray-700 dark:text-gray-50'
             ></textarea>
             {errors.observacoes && (
@@ -297,7 +297,7 @@ export function AgendamentoPetshop() {
 
           <button
             type='submit'
-            // CORRIGIDO: Botão e Hover Adaptados
+            //  Botão e Hover Adaptados
             className='w-full p-3 bg-pink-500 dark:bg-pink-600 text-white font-bold rounded-md hover:bg-pink-600 dark:hover:bg-pink-700 transition'
           >
             Agendar Serviço de Petshop

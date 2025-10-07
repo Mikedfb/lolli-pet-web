@@ -7,16 +7,16 @@ export function Home() {
     <main className='w-full transition-colors duration-500'>
       {/* 1. SEÇÃO HERO (Banner/Destaque) */}
       <section
-        // CORRIGIDO: Fundo adaptado para Light e Dark Mode
+        //Fundo adaptado para Light e Dark Mode
         className='relative bg-white dark:bg-gray-900 h-[45vh] flex items-center justify-center text-center py-10 border-b dark:border-gray-700'
       >
-        {/* CORRIGIDO: Fundo e Sombra do Conteúdo Central adaptados */}
+        {/*  Fundo e Sombra do Conteúdo Central adaptados */}
         <div className='relative z-10 max-w-4xl px-4 shadow-xl p-8 rounded-xl bg-cyan-50 dark:bg-gray-800 transition duration-500'>
-          {/* CORRIGIDO: Cores do Título Light e Dark */}
+          {/*  Cores do Título Light e Dark */}
           <h1 className='text-4xl md:text-5xl font-extrabold text-cyan-800 dark:text-cyan-400 mb-4 leading-tight'>
             Onde a saúde e a alegria do seu pet se encontram!
           </h1>
-          {/* CORRIGIDO: Cores do Parágrafo Light e Dark */}
+          {/*  Cores do Parágrafo Light e Dark */}
           <p className='text-lg text-gray-700 dark:text-gray-300 mb-8'>
             Oferecemos o melhor em cuidados veterinários e serviços de estética,
             tudo em um só lugar.
@@ -31,7 +31,7 @@ export function Home() {
             >
               Agendar Consulta
             </Link>
-            {/* CORRIGIDO: Botão Amarelo adaptado */}
+            {/*  Botão Amarelo adaptado */}
             <Link
               to='/agendamento-petshop'
               className='px-6 py-3 bg-yellow-400 dark:bg-yellow-500 text-gray-800 dark:text-gray-900 text-md font-bold rounded-full shadow-md hover:bg-yellow-500 dark:hover:bg-yellow-600 transition duration-300 transform hover:scale-105'
@@ -43,7 +43,7 @@ export function Home() {
       </section>
 
       {/* 2. SEÇÃO DE SERVIÇOS */}
-      {/* CORRIGIDO: Fundo da Seção adaptado */}
+      {/*  Fundo da Seção adaptado */}
       <section className='py-16 px-5 bg-gray-100 dark:bg-gray-900 transition-colors duration-500'>
         <div className='max-w-7xl mx-auto'>
           {/* Título Centralizado adaptado */}
