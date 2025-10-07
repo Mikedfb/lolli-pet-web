@@ -113,36 +113,41 @@ const ProntuarioDetalhes: React.FC<ProntuarioDetalhesProps> = ({
   onClose,
 }) => {
   // Ordena o histórico pela data (mais recente primeiro)
-  const historicoOrdenado = [...pet.historico].sort(
-    (a, b) =>
-      new Date(b.data.split('/').reverse().join('-')).getTime() -
-      new Date(a.data.split('/').reverse().join('-')).getTime(),
-  );
+  const historicoOrdenado = [...pet.historico].sort((a, b) => {
+    // Converte a data DD/MM/AAAA para AAAA-MM-DD para comparação
+    const dateA = new Date(a.data.split('/').reverse().join('-')).getTime();
+    const dateB = new Date(b.data.split('/').reverse().join('-')).getTime();
+    return dateB - dateA;
+  });
 
   // Simula o Anexo de Arquivo
   const handleAnexarArquivo = () => {
-    alert(
-      `Abrindo seletor de arquivos para anexar um novo documento ao Pet ${pet.nome}.`,
+    // Substituído alert() por console.log()
+    console.log(
+      `[Simulação] Abrindo seletor de arquivos para anexar um novo documento ao Pet ${pet.nome}.`,
     );
     // Aqui seria a lógica de upload e atualização do histórico.
   };
 
   return (
-    <div className='mt-8 bg-white p-6 rounded-xl shadow-lg border-t-4 border-pink-500'>
-      <div className='flex justify-between items-start border-b border-gray-200 pb-3 mb-4'>
-        <h2 className='text-2xl font-bold text-pink-700 flex items-center gap-2'>
+    // Estilo adaptado para Dark Mode
+    <div className='mt-8 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-t-4 border-pink-500 dark:border-pink-600 transition-colors duration-500'>
+      <div className='flex justify-between items-start border-b border-gray-200 dark:border-gray-700 pb-3 mb-4'>
+        {/* Título adaptado */}
+        <h2 className='text-2xl font-bold text-pink-700 dark:text-pink-400 flex items-center gap-2'>
           <FileText size={24} /> Prontuário de {pet.nome}
         </h2>
         <button
           onClick={onClose}
-          className='p-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition text-sm font-semibold'
+          // Botão adaptado
+          className='p-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm font-semibold'
         >
           Fechar
         </button>
       </div>
 
       {/* Informações Básicas */}
-      <div className='grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-6 pb-4 border-b border-gray-100'>
+      <div className='grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-6 pb-4 border-b border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-200'>
         <p>
           <strong>ID:</strong> {pet.id}
         </p>
@@ -158,7 +163,7 @@ const ProntuarioDetalhes: React.FC<ProntuarioDetalhesProps> = ({
       </div>
 
       {/* HISTÓRICO DE ATENDIMENTOS (Consultas e Banhos) */}
-      <h3 className='text-xl font-bold text-cyan-700 mb-3 flex items-center gap-2'>
+      <h3 className='text-xl font-bold text-cyan-700 dark:text-cyan-400 mb-3 flex items-center gap-2'>
         <Calendar size={20} /> Histórico de Atendimentos
       </h3>
 
@@ -166,15 +171,15 @@ const ProntuarioDetalhes: React.FC<ProntuarioDetalhesProps> = ({
         {historicoOrdenado.map(entry => (
           <div
             key={entry.id}
-            // Cor da borda baseada no tipo de serviço
-            className={`p-4 rounded-lg shadow-sm border-l-4 ${
+            // Cor da borda baseada no tipo de serviço e Dark Mode
+            className={`p-4 rounded-lg shadow-sm border-l-4 transition-colors duration-500 ${
               entry.tipo === 'Banho' || entry.tipo === 'Tosa'
-                ? 'border-pink-300 bg-pink-50'
-                : 'border-cyan-300 bg-cyan-50'
+                ? 'border-pink-300 bg-pink-50 dark:border-pink-700 dark:bg-gray-700/50'
+                : 'border-cyan-300 bg-cyan-50 dark:border-cyan-700 dark:bg-gray-700/50'
             }`}
           >
             <div className='flex justify-between items-center mb-2'>
-              <span className='text-xs font-semibold uppercase text-gray-600'>
+              <span className='text-xs font-semibold uppercase text-gray-600 dark:text-gray-300'>
                 {entry.data}
               </span>
               <span
@@ -187,35 +192,32 @@ const ProntuarioDetalhes: React.FC<ProntuarioDetalhesProps> = ({
                 {entry.tipo}
               </span>
             </div>
-            <p className='text-sm font-semibold text-gray-800 mb-1'>
+            <p className='text-sm font-semibold text-gray-800 dark:text-gray-100 mb-1'>
               {entry.descricao}
             </p>
-            <p className='text-xs italic text-gray-500'>
+            <p className='text-xs italic text-gray-500 dark:text-gray-400'>
               Responsável: {entry.responsavel}
             </p>
 
             {/* ANEXOS */}
             {entry.arquivos.length > 0 && (
-              <div className='mt-2 border-t border-gray-100 pt-2'>
-                <p className='text-xs font-semibold text-gray-700 flex items-center gap-1'>
+              <div className='mt-2 border-t border-gray-100 dark:border-gray-600 pt-2'>
+                <p className='text-xs font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'>
                   <Paperclip size={14} /> Anexos:
                 </p>
                 <div className='flex flex-wrap gap-2 mt-1'>
-                  {entry.arquivos.map(
-                    (
-                      file, // <-- CORRIGIDO: Removido o parâmetro 'i'
-                    ) => (
-                      <a
-                        key={file.nome} // <-- CORRIGIDO: Usando file.nome como key
-                        href={file.url}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='text-xs text-yellow-700 bg-yellow-100 px-2 py-1 rounded-full hover:bg-yellow-200 transition'
-                      >
-                        {file.nome}
-                      </a>
-                    ),
-                  )}
+                  {entry.arquivos.map(file => (
+                    <a
+                      key={file.nome}
+                      href={file.url}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      // Link adaptado para Dark Mode
+                      className='text-xs text-yellow-700 dark:text-yellow-300 bg-yellow-100 dark:bg-yellow-900/50 px-2 py-1 rounded-full hover:bg-yellow-200 dark:hover:bg-yellow-800/50 transition'
+                    >
+                      {file.nome}
+                    </a>
+                  ))}
                 </div>
               </div>
             )}
@@ -223,17 +225,18 @@ const ProntuarioDetalhes: React.FC<ProntuarioDetalhesProps> = ({
         ))}
 
         {historicoOrdenado.length === 0 && (
-          <p className='text-center text-gray-500 italic p-4 border border-dashed rounded-lg'>
+          <p className='text-center text-gray-500 dark:text-gray-400 italic p-4 border border-dashed rounded-lg dark:border-gray-600'>
             Não há histórico de atendimentos registrado para este Pet.
           </p>
         )}
       </div>
 
       {/* BOTÃO PARA ANEXAR ARQUIVOS */}
-      <div className='mt-6 pt-4 border-t border-gray-100 text-center'>
+      <div className='mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 text-center'>
         <button
           onClick={handleAnexarArquivo}
-          className='p-3 bg-cyan-500 text-white font-bold rounded-md hover:bg-cyan-600 transition flex items-center justify-center gap-2 mx-auto'
+          // Botão adaptado para Dark Mode
+          className='p-3 bg-cyan-500 dark:bg-cyan-600 text-white font-bold rounded-md hover:bg-cyan-600 dark:hover:bg-cyan-700 transition flex items-center justify-center gap-2 mx-auto'
         >
           <PlusCircle size={20} /> Anexar Novo Arquivo/Imagem
         </button>
@@ -243,8 +246,8 @@ const ProntuarioDetalhes: React.FC<ProntuarioDetalhesProps> = ({
 };
 
 // --- COMPONENTE PRINCIPAL (PRONTUÁRIO) ---
-
-export function Prontuario() {
+// FIX: Renomeado para App e alterado para exportação padrão para funcionar no ambiente de ficheiro único.
+export default function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null); // Estado para o Pet selecionado
 
@@ -257,8 +260,9 @@ export function Prontuario() {
   );
 
   const handleEdit = (pet: Pet) => {
-    alert(
-      `Abrindo formulário de edição para o Pet: ${pet.nome} (Cliente: ${pet.cliente}). Você seria levado para uma página de edição.`,
+    // Substituído alert() por console.log()
+    console.log(
+      `[Simulação] Abrindo formulário de edição para o Pet: ${pet.nome} (Cliente: ${pet.cliente}).`,
     );
   };
 
@@ -273,82 +277,89 @@ export function Prontuario() {
   };
 
   return (
-    <div className='p-8 bg-gray-50 min-h-[calc(100vh-150px)] flex justify-center items-start'>
+    // Container principal com Dark Mode
+    <div className='p-8 bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-150px)] flex justify-center items-start transition-colors duration-500'>
       <div className='container max-w-5xl w-full'>
-        {/* TÍTULO H1 */}
-        <h1 className='text-3xl font-extrabold text-center text-pink-600 mb-6 border-b-2 border-yellow-400 pb-2 flex items-center justify-center gap-2'>
+        {/* TÍTULO H1 adaptado */}
+        <h1 className='text-3xl font-extrabold text-center text-pink-600 dark:text-pink-400 mb-6 border-b-2 border-yellow-400 dark:border-yellow-600 pb-2 flex items-center justify-center gap-2'>
           <ClipboardList size={30} />
           Gerenciamento de Prontuários
         </h1>
-        <p className='text-center text-gray-500 mb-8'>
+        {/* Descrição adaptada */}
+        <p className='text-center text-gray-500 dark:text-gray-400 mb-8'>
           Busque um paciente para visualizar seu histórico ou editar seu
           cadastro.
         </p>
 
         {/* --- 1. SEÇÃO DE BUSCA E LISTAGEM DE PACIENTES --- */}
         <section
-          className={`bg-white p-6 rounded-xl shadow-lg border-t-4 border-cyan-500 ${
+          className={`bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-t-4 border-cyan-500 ${
             selectedPet ? 'mb-4' : 'mb-8'
-          }`}
+          } transition-colors duration-500`}
         >
-          <h2 className='text-2xl font-bold text-cyan-700 mb-4 flex items-center gap-2 border-b border-cyan-100 pb-2'>
+          {/* Título da seção adaptado */}
+          <h2 className='text-2xl font-bold text-cyan-700 dark:text-cyan-400 mb-4 flex items-center gap-2 border-b border-cyan-100 dark:border-gray-700 pb-2'>
             <PawPrint size={24} /> Listagem de Pacientes
           </h2>
 
-          {/* CAMPO DE BUSCA */}
+          {/* CAMPO DE BUSCA adaptado */}
           <div className='mb-6 relative'>
             <input
               type='text'
               placeholder='Buscar por Nome do Pet, Nome do Cliente ou ID...'
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className='w-full p-3 pl-10 border-2 border-cyan-300 rounded-lg focus:border-cyan-500 focus:ring-cyan-500 transition'
+              className='w-full p-3 pl-10 border-2 border-cyan-300 dark:border-cyan-700 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-cyan-500 transition'
               disabled={!!selectedPet} // Desabilita a busca ao ver o prontuário
             />
             <Search
               size={20}
-              className='absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-500'
+              className='absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-500 dark:text-cyan-400'
             />
           </div>
 
           {/* TABELA DE PACIENTES */}
-          <div className='overflow-x-auto shadow-md rounded-lg border border-gray-100'>
-            <table className='min-w-full divide-y divide-gray-200'>
-              {/* ... (cabeçalho da tabela) ... */}
-              <thead className='bg-cyan-50'>
+          <div className='overflow-x-auto shadow-md rounded-lg border border-gray-100 dark:border-gray-700'>
+            <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
+              {/* Cabeçalho da tabela adaptado */}
+              <thead className='bg-cyan-50 dark:bg-gray-700'>
                 <tr>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'>
                     Pet / Cliente
                   </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell'>
+                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell'>
                     Espécie / Raça
                   </th>
-                  <th className='px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                  <th className='px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'>
                     Ações
                   </th>
                 </tr>
               </thead>
-              <tbody className='bg-white divide-y divide-gray-200'>
+              {/* Corpo da tabela adaptado */}
+              <tbody className='bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700'>
                 {filteredPacientes.length > 0 ? (
                   filteredPacientes.map(pet => (
-                    <tr key={pet.id} className='hover:bg-gray-50 transition'>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900'>
+                    <tr
+                      key={pet.id}
+                      className='hover:bg-gray-50 dark:hover:bg-gray-700 transition'
+                    >
+                      <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100'>
                         <div className='flex items-center gap-2'>
                           <PawPrint size={16} className='text-pink-500' />
                           <div>
                             <div className='font-bold'>
                               {pet.nome}{' '}
-                              <span className='text-xs text-gray-500 ml-1'>
+                              <span className='text-xs text-gray-500 dark:text-gray-400 ml-1'>
                                 ({pet.id})
                               </span>
                             </div>
-                            <div className='text-gray-500 text-xs flex items-center gap-1'>
+                            <div className='text-gray-500 dark:text-gray-400 text-xs flex items-center gap-1'>
                               <User size={12} /> {pet.cliente}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-700 hidden sm:table-cell'>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 hidden sm:table-cell'>
                         {pet.especie} {pet.raca && `(${pet.raca})`}
                       </td>
                       <td className='px-6 py-4 whitespace-nowrap text-center text-sm font-medium'>
@@ -356,7 +367,7 @@ export function Prontuario() {
                           {/* Botão para ABRIR PRONTUÁRIO */}
                           <button
                             onClick={() => handleViewProntuario(pet)}
-                            className='p-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 transition flex items-center justify-center gap-1 text-xs sm:text-sm'
+                            className='p-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 transition flex items-center justify-center gap-1 text-xs sm:text-sm disabled:bg-pink-700'
                             title='Visualizar Prontuário'
                             disabled={selectedPet?.id === pet.id}
                           >
@@ -379,7 +390,7 @@ export function Prontuario() {
                   <tr>
                     <td
                       colSpan={3}
-                      className='px-6 py-4 text-center text-gray-500 italic'
+                      className='px-6 py-4 text-center text-gray-500 dark:text-gray-400 italic'
                     >
                       Nenhum paciente encontrado.
                     </td>

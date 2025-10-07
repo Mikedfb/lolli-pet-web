@@ -42,7 +42,8 @@ const cadastrarClienteSchema = z.object({
 type PetFormData = z.infer<typeof petSchema>;
 type CadastrarClienteFormData = z.infer<typeof cadastrarClienteSchema>;
 
-export function CadastrarCliente() {
+// FIX: O componente principal foi renomeado para 'App' e mantido como exportação padrão para garantir a correta renderização.
+export default function App() {
   const {
     register,
     handleSubmit,
@@ -67,46 +68,59 @@ export function CadastrarCliente() {
 
   function onSubmit(data: CadastrarClienteFormData) {
     console.log('Cliente e Pets Cadastrados:', data);
-    alert(
+    // Substituído alert() por console.log para seguir as diretrizes.
+    console.log(
       `Cliente ${data.nome} cadastrado com sucesso, com ${data.pets.length} pet(s)!`,
     );
     // Lógica de API aqui
   }
 
   return (
-    <div className='p-8 bg-gray-50 min-h-[calc(100vh-150px)] flex justify-center items-start'>
+    // Fundo da página com suporte a Dark Mode (dark:bg-gray-900)
+    <div className='p-8 bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-150px)] flex justify-center items-start transition-colors duration-500'>
       <div className='container max-w-3xl w-full'>
-        <h1 className='text-3xl font-extrabold text-center text-pink-600 mb-6 border-b-2 border-yellow-400 pb-2 flex items-center justify-center gap-2'>
+        {/* Título principal adaptado */}
+        <h1 className='text-3xl font-extrabold text-center text-pink-600 dark:text-pink-400 mb-6 border-b-2 border-yellow-400 dark:border-yellow-600 pb-2 flex items-center justify-center gap-2'>
           <UserPlus size={30} />
           Cadastro de Cliente e Pets
         </h1>
-        <p className='text-center text-gray-500 mb-8'>
+        {/* Parágrafo de descrição adaptado */}
+        <p className='text-center text-gray-500 dark:text-gray-400 mb-8'>
           Cadastre as informações do cliente e de todos os seus animais de
           estimação.
         </p>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className='space-y-6 p-8 bg-white rounded-xl shadow-lg border border-gray-100'
+          // Fundo do formulário adaptado (dark:bg-gray-800)
+          className='space-y-6 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 transition-colors duration-500'
         >
+          {/* Dados do Cliente */}
           <fieldset className='border-2 border-cyan-500 p-4 rounded-md'>
-            <legend className='font-bold text-lg text-cyan-700 px-2'>
+            {/* Legenda adaptada */}
+            <legend className='font-bold text-lg text-cyan-700 dark:text-cyan-400 px-2'>
               Dados do Cliente
             </legend>
 
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
               <div className='form-group md:col-span-3'>
+                {/* Label adaptado */}
                 <label
                   htmlFor='nome'
-                  className=' font-semibold text-gray-700 flex items-center gap-1'
+                  className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
                 >
-                  <User size={16} className='text-cyan-500' /> Nome Completo:
+                  <User
+                    size={16}
+                    className='text-cyan-500 dark:text-cyan-400'
+                  />{' '}
+                  Nome Completo:
                 </label>
+                {/* Input adaptado (cores e foco) */}
                 <input
                   type='text'
                   id='nome'
                   {...register('nome')}
-                  className='w-full p-2 border border-gray-300 rounded focus:border-cyan-500'
+                  className='w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded focus:border-cyan-500 dark:focus:border-cyan-400'
                 />
                 {errors.nome && (
                   <p className='text-red-500 text-sm mt-1'>
@@ -116,17 +130,23 @@ export function CadastrarCliente() {
               </div>
 
               <div className='form-group'>
+                {/* Label adaptado */}
                 <label
                   htmlFor='email'
-                  className=' font-semibold text-gray-700 flex items-center gap-1'
+                  className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
                 >
-                  <Mail size={16} className='text-cyan-500' /> E-mail:
+                  <Mail
+                    size={16}
+                    className='text-cyan-500 dark:text-cyan-400'
+                  />{' '}
+                  E-mail:
                 </label>
+                {/* Input adaptado (cores e foco) */}
                 <input
                   type='email'
                   id='email'
                   {...register('email')}
-                  className='w-full p-2 border border-gray-300 rounded focus:border-cyan-500'
+                  className='w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded focus:border-cyan-500 dark:focus:border-cyan-400'
                 />
                 {errors.email && (
                   <p className='text-red-500 text-sm mt-1'>
@@ -136,18 +156,24 @@ export function CadastrarCliente() {
               </div>
 
               <div className='form-group'>
+                {/* Label adaptado */}
                 <label
                   htmlFor='telefone'
-                  className=' font-semibold text-gray-700 flex items-center gap-1'
+                  className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
                 >
-                  <Phone size={16} className='text-cyan-500' /> Telefone:
+                  <Phone
+                    size={16}
+                    className='text-cyan-500 dark:text-cyan-400'
+                  />{' '}
+                  Telefone:
                 </label>
+                {/* Input adaptado (cores e foco) */}
                 <input
                   type='tel'
                   id='telefone'
                   {...register('telefone')}
                   placeholder='(00) 00000-0000'
-                  className='w-full p-2 border border-gray-300 rounded focus:border-cyan-500'
+                  className='w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded focus:border-cyan-500 dark:focus:border-cyan-400'
                 />
                 {errors.telefone && (
                   <p className='text-red-500 text-sm mt-1'>
@@ -158,18 +184,23 @@ export function CadastrarCliente() {
             </div>
           </fieldset>
 
+          {/* Dados dos Pets */}
           <fieldset className='border-2 border-cyan-500 p-4 rounded-md space-y-4'>
-            <legend className='font-bold text-lg text-cyan-700 px-2 flex items-center gap-2'>
-              <Dog size={20} className='text-cyan-500' /> Dados dos Pets
+            {/* Legenda adaptada */}
+            <legend className='font-bold text-lg text-cyan-700 dark:text-cyan-400 px-2 flex items-center gap-2'>
+              <Dog size={20} className='text-cyan-500 dark:text-cyan-400' />{' '}
+              Dados dos Pets
             </legend>
 
             {fields.map((field, index) => (
               <div
                 key={field.id}
-                className='pet-block border border-gray-300 p-4 rounded-lg bg-gray-50 space-y-3'
+                // Fundo do Pet Block adaptado
+                className='pet-block border border-gray-300 dark:border-gray-600 p-4 rounded-lg bg-gray-50 dark:bg-gray-700 space-y-3'
               >
-                <div className='flex justify-between items-center border-b border-pink-300 pb-2 mb-3'>
-                  <h4 className='text-xl font-bold text-pink-600 flex items-center gap-2'>
+                <div className='flex justify-between items-center border-b border-pink-300 dark:border-pink-700 pb-2 mb-3'>
+                  {/* Título do Pet Block adaptado */}
+                  <h4 className='text-xl font-bold text-pink-600 dark:text-pink-400 flex items-center gap-2'>
                     <PawPrint size={18} /> Pet {index + 1}
                   </h4>
 
@@ -178,7 +209,8 @@ export function CadastrarCliente() {
                     <button
                       type='button'
                       onClick={() => remove(index)}
-                      className='p-2 bg-red-400 text-white rounded-full hover:bg-red-500 transition flex items-center gap-1 text-sm'
+                      // Botão Remover adaptado
+                      className='p-2 bg-red-400 dark:bg-red-600 text-white rounded-full hover:bg-red-500 dark:hover:bg-red-700 transition flex items-center gap-1 text-sm'
                     >
                       <Trash2 size={16} /> Remover
                     </button>
@@ -187,17 +219,19 @@ export function CadastrarCliente() {
 
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                   <div className='form-group'>
+                    {/* Label adaptado */}
                     <label
                       htmlFor={`pets.${index}.nome`}
-                      className='block font-semibold text-gray-700'
+                      className='block font-semibold text-gray-700 dark:text-gray-300'
                     >
                       Nome do Pet:
                     </label>
+                    {/* Input adaptado (cores e foco) */}
                     <input
                       type='text'
                       id={`pets.${index}.nome`}
                       {...register(`pets.${index}.nome`)}
-                      className='w-full p-2 border border-gray-300 rounded focus:border-pink-500'
+                      className='w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded focus:border-pink-500 dark:focus:border-pink-400'
                     />
                     {errors.pets?.[index]?.nome && (
                       <p className='text-red-500 text-sm mt-1'>
@@ -207,18 +241,20 @@ export function CadastrarCliente() {
                   </div>
 
                   <div className='form-group'>
+                    {/* Label adaptado */}
                     <label
                       htmlFor={`pets.${index}.especie`}
-                      className='block font-semibold text-gray-700'
+                      className='block font-semibold text-gray-700 dark:text-gray-300'
                     >
                       Espécie:
                     </label>
+                    {/* Input adaptado (cores e foco) */}
                     <input
                       type='text'
                       id={`pets.${index}.especie`}
                       {...register(`pets.${index}.especie`)}
                       placeholder='Ex: Cachorro, Gato'
-                      className='w-full p-2 border border-gray-300 rounded focus:border-pink-500'
+                      className='w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded focus:border-pink-500 dark:focus:border-pink-400'
                     />
                     {errors.pets?.[index]?.especie && (
                       <p className='text-red-500 text-sm mt-1'>
@@ -228,17 +264,19 @@ export function CadastrarCliente() {
                   </div>
 
                   <div className='form-group'>
+                    {/* Label adaptado */}
                     <label
                       htmlFor={`pets.${index}.raca`}
-                      className='block font-semibold text-gray-700'
+                      className='block font-semibold text-gray-700 dark:text-gray-300'
                     >
                       Raça (Opcional):
                     </label>
+                    {/* Input adaptado (cores e foco) */}
                     <input
                       type='text'
                       id={`pets.${index}.raca`}
                       {...register(`pets.${index}.raca`)}
-                      className='w-full p-2 border border-gray-300 rounded focus:border-pink-500'
+                      className='w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded focus:border-pink-500 dark:focus:border-pink-400'
                     />
                     {errors.pets?.[index]?.raca && (
                       <p className='text-red-500 text-sm mt-1'>
@@ -262,7 +300,8 @@ export function CadastrarCliente() {
               onClick={() =>
                 append({ nome: '', especie: '', raca: '' } as PetFormData)
               }
-              className='mt-4 p-2 bg-cyan-500 text-white font-bold rounded-md hover:bg-cyan-600 transition flex items-center justify-center gap-2'
+              // Botão Adicionar Pet adaptado
+              className='mt-4 p-2 bg-cyan-500 dark:bg-cyan-600 text-white font-bold rounded-md hover:bg-cyan-600 dark:hover:bg-cyan-700 transition flex items-center justify-center gap-2'
             >
               <PlusCircle size={20} /> Adicionar outro Pet
             </button>
@@ -270,7 +309,8 @@ export function CadastrarCliente() {
 
           <button
             type='submit'
-            className='w-full p-3 bg-pink-500 text-white font-bold rounded-md hover:bg-pink-600 transition text-lg'
+            // Botão de Submissão adaptado
+            className='w-full p-3 bg-pink-500 dark:bg-pink-600 text-white font-bold rounded-md hover:bg-pink-600 dark:hover:bg-pink-700 transition text-lg'
           >
             Cadastrar Cliente e Pets
           </button>

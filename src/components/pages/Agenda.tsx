@@ -81,6 +81,8 @@ interface AgendamentoCardProps {
   ) => void;
 }
 
+// --- COMPONENTE INTERNO: AgendamentoCard (AGORA COM DARK MODE) ---
+
 const AgendamentoCard: React.FC<AgendamentoCardProps> = ({
   agendamento,
   tipo,
@@ -88,67 +90,86 @@ const AgendamentoCard: React.FC<AgendamentoCardProps> = ({
   onEdit,
 }) => {
   const isClinica = tipo === 'clinica';
-  const borderClass = isClinica ? 'border-cyan-500' : 'border-pink-500';
-  const accentClass = isClinica ? 'text-cyan-600' : 'text-pink-600';
+  // CORRIGIDO: Cores de Borda e Acento Adaptadas
+  const borderClass = isClinica
+    ? 'border-cyan-500 dark:border-cyan-600'
+    : 'border-pink-500 dark:border-pink-600';
+  const accentClass = isClinica
+    ? 'text-cyan-600 dark:text-cyan-400'
+    : 'text-pink-600 dark:text-pink-400';
   const isPetshop = tipo === 'petshop';
 
   return (
     <div
-      className={`agendamento-card bg-white p-4 rounded-lg shadow-md border-l-4 ${borderClass} transition hover:shadow-lg`}
+      // CORRIGIDO: Fundo, Sombra e Hover do Card Adaptados
+      className={`agendamento-card bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md border-l-4 ${borderClass} transition hover:shadow-lg dark:shadow-gray-700/50`}
     >
       <div className='flex justify-between items-start'>
-        <h3 className={`text-xl font-bold ${accentClass}`}>
+        {/* CORRIGIDO: Título Adaptado */}
+        <h3
+          className={`text-xl font-bold text-gray-800 dark:text-gray-200 ${accentClass}`}
+        >
           {agendamento.tipoServico}
         </h3>
-        <span className='text-sm text-gray-500'>#{agendamento.id}</span>
+        {/* CORRIGIDO: ID Adaptado */}
+        <span className='text-sm text-gray-500 dark:text-gray-400'>
+          #{agendamento.id}
+        </span>
       </div>
 
-      <p className='mt-2 text-sm flex items-center gap-2'>
+      {/* CORRIGIDO: Cor do Texto e Ícones dos Detalhes Adaptadas */}
+      <p className='mt-2 text-sm flex items-center gap-2 text-gray-700 dark:text-gray-300'>
         <Clock size={16} className={accentClass} />
         <span className='font-bold'>Horário:</span> {agendamento.hora}
       </p>
 
-      <p className='text-sm flex items-center gap-2'>
-        <User size={16} className='text-gray-500' />
+      <p className='text-sm flex items-center gap-2 text-gray-700 dark:text-gray-300'>
+        <User size={16} className='text-gray-500 dark:text-gray-400' />
         <span className='font-bold'>Cliente:</span> {agendamento.nomeCliente}
       </p>
 
-      <p className='text-sm flex items-center gap-2'>
-        <PawPrint size={16} className='text-gray-500' />
+      <p className='text-sm flex items-center gap-2 text-gray-700 dark:text-gray-300'>
+        <PawPrint size={16} className='text-gray-500 dark:text-gray-400' />
         <span className='font-bold'>Pet:</span> {agendamento.nomePet}
       </p>
 
       {isClinica && (
-        <p className='text-sm flex items-center gap-2'>
-          <StethoscopeIcon size={16} className='text-gray-500' />
+        <p className='text-sm flex items-center gap-2 text-gray-700 dark:text-gray-300'>
+          <StethoscopeIcon
+            size={16}
+            className='text-gray-500 dark:text-gray-400'
+          />
           <span className='font-bold'>Médico:</span>{' '}
           {(agendamento as AgendamentoClinico).medicoResponsavel}
         </p>
       )}
       {isPetshop && (
-        <p className='text-sm flex items-center gap-2'>
-          <BathIcon size={16} className='text-gray-500' />
+        <p className='text-sm flex items-center gap-2 text-gray-700 dark:text-gray-300'>
+          <BathIcon size={16} className='text-gray-500 dark:text-gray-400' />
           <span className='font-bold'>Profissional:</span>{' '}
           {(agendamento as AgendamentoPetshop).profissional}
         </p>
       )}
 
       {agendamento.observacoes && (
-        <p className='text-xs italic mt-2 text-gray-500 border-t pt-2'>
+        // CORRIGIDO: Observações e Borda Separadora Adaptadas
+        <p className='text-xs italic mt-2 text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-600 pt-2'>
           Obs: {agendamento.observacoes}
         </p>
       )}
 
-      <div className='flex gap-2 mt-4 pt-4 border-t border-gray-100'>
+      <div className='flex gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700'>
         <button
           onClick={() => onEdit(agendamento.id, agendamento)}
-          className={`flex-1 p-2 bg-yellow-400 text-gray-800 font-bold rounded-md hover:bg-yellow-500 transition flex items-center justify-center gap-1 text-sm`}
+          // CORRIGIDO: Botão Editar Adaptado
+          className={`flex-1 p-2 bg-yellow-400 dark:bg-yellow-600 text-gray-800 dark:text-gray-50 font-bold rounded-md hover:bg-yellow-500 dark:hover:bg-yellow-700 transition flex items-center justify-center gap-1 text-sm`}
         >
           <Edit size={16} /> Editar
         </button>
         <button
           onClick={() => onCancel(agendamento.id)}
-          className='flex-1 p-2 bg-red-500 text-white font-bold rounded-md hover:bg-red-600 transition flex items-center justify-center gap-1 text-sm'
+          // CORRIGIDO: Botão Cancelar Adaptado
+          className='flex-1 p-2 bg-red-500 dark:bg-red-600 text-white font-bold rounded-md hover:bg-red-600 dark:hover:bg-red-700 transition flex items-center justify-center gap-1 text-sm'
         >
           <Trash2 size={16} /> Cancelar
         </button>
@@ -156,6 +177,8 @@ const AgendamentoCard: React.FC<AgendamentoCardProps> = ({
     </div>
   );
 };
+
+// --- COMPONENTE PRINCIPAL: Agenda (AGORA COM DARK MODE) ---
 
 export function Agenda() {
   const hoje = new Date().toLocaleDateString('pt-BR', {
@@ -187,19 +210,24 @@ export function Agenda() {
   };
 
   return (
-    <div className='p-8 bg-gray-50 min-h-[calc(100vh-150px)] flex justify-center items-start'>
+    // CORRIGIDO: Fundo da Página Adaptado
+    <div className='p-8 bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-150px)] flex justify-center items-start transition-colors duration-500'>
       <div className='container max-w-6xl w-full'>
-        <h1 className='text-3xl font-extrabold text-center text-pink-600 mb-6 border-b-2 border-yellow-400 pb-2 flex items-center justify-center gap-2'>
+        {/* CORRIGIDO: Título Principal Adaptado */}
+        <h1 className='text-3xl font-extrabold text-center text-pink-600 dark:text-pink-400 mb-6 border-b-2 border-yellow-400 dark:border-yellow-600 pb-2 flex items-center justify-center gap-2'>
           <CalendarDays size={30} />
           Agenda do Dia
         </h1>
-        <p className='text-center text-gray-500 mb-8 font-semibold'>
+        {/* CORRIGIDO: Parágrafo de Data Adaptado */}
+        <p className='text-center text-gray-500 dark:text-gray-400 mb-8 font-semibold'>
           Agendamentos para **{hoje}**
         </p>
 
         <div className='agenda-container flex flex-col lg:flex-row gap-8'>
-          <section className='agenda-clinica flex-1 bg-white p-6 rounded-xl shadow-lg border-t-4 border-cyan-500'>
-            <h2 className='text-2xl font-bold text-center text-cyan-700 mb-6 border-b border-cyan-200 pb-3 flex items-center justify-center gap-2'>
+          {/* CORRIGIDO: Seção Clínica Fundo, Borda e Sombra Adaptados */}
+          <section className='agenda-clinica flex-1 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-t-4 border-cyan-500 dark:border-cyan-600 transition-colors duration-500'>
+            {/* CORRIGIDO: Título Seção Clínica Adaptado */}
+            <h2 className='text-2xl font-bold text-center text-cyan-700 dark:text-cyan-400 mb-6 border-b border-cyan-200 dark:border-cyan-700 pb-3 flex items-center justify-center gap-2'>
               <StethoscopeIcon size={24} /> Agenda Clínica
             </h2>
             <div className='space-y-4'>
@@ -214,14 +242,16 @@ export function Agenda() {
               ))}
             </div>
             {mockAgendaClinica.length === 0 && (
-              <p className='text-center text-gray-500 italic mt-8'>
+              <p className='text-center text-gray-500 dark:text-gray-400 italic mt-8'>
                 Nenhum agendamento clínico para hoje.
               </p>
             )}
           </section>
 
-          <section className='agenda-petshop flex-1 bg-white p-6 rounded-xl shadow-lg border-t-4 border-pink-500'>
-            <h2 className='text-2xl font-bold text-center text-pink-700 mb-6 border-b border-pink-200 pb-3 flex items-center justify-center gap-2'>
+          {/* CORRIGIDO: Seção Petshop Fundo, Borda e Sombra Adaptados */}
+          <section className='agenda-petshop flex-1 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-t-4 border-pink-500 dark:border-pink-600 transition-colors duration-500'>
+            {/* CORRIGIDO: Título Seção Petshop Adaptado */}
+            <h2 className='text-2xl font-bold text-center text-pink-700 dark:text-pink-400 mb-6 border-b border-pink-200 dark:border-pink-700 pb-3 flex items-center justify-center gap-2'>
               <BathIcon size={24} /> Agenda Petshop
             </h2>
             <div className='space-y-4'>
@@ -236,7 +266,7 @@ export function Agenda() {
               ))}
             </div>
             {mockAgendaPetshop.length === 0 && (
-              <p className='text-center text-gray-500 italic mt-8'>
+              <p className='text-center text-gray-500 dark:text-gray-400 italic mt-8'>
                 Nenhum agendamento de petshop para hoje.
               </p>
             )}

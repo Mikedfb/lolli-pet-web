@@ -62,22 +62,26 @@ export function AgendamentoClinico() {
   }
 
   return (
-    <div className='p-8 bg-gray-50 min-h-[calc(100vh-150px)] flex justify-center items-start'>
+    // CORRIGIDO: Fundo da Página Adaptado
+    <div className='p-8 bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-150px)] flex justify-center items-start transition-colors duration-500'>
       <div className='container max-w-2xl w-full'>
-        <h1 className='text-3xl font-extrabold text-center text-pink-600 mb-6 border-b-2 border-yellow-400 pb-2 flex items-center justify-center gap-2'>
+        {/* CORRIGIDO: Título e Borda Adaptados (Ciano) */}
+        <h1 className='text-3xl font-extrabold text-center text-cyan-600 dark:text-cyan-400 mb-6 border-b-2 border-yellow-400 dark:border-yellow-600 pb-2 flex items-center justify-center gap-2'>
           <StethoscopeIcon size={30} />
           Novo Agendamento Clínico
         </h1>
-        <p className='text-center text-gray-500 mb-8'>
+        {/* CORRIGIDO: Parágrafo Adaptado */}
+        <p className='text-center text-gray-500 dark:text-gray-400 mb-8'>
           Preencha os dados do cliente e do pet para agendar uma consulta.
         </p>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className='space-y-6 p-8 bg-white rounded-xl shadow-lg border border-gray-100'
+          // CORRIGIDO: Fundo e Borda do Formulário Adaptados
+          className='space-y-6 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700'
         >
-          <fieldset className='border-2 border-cyan-500 p-4 rounded-md'>
-            <legend className='font-bold text-lg text-cyan-700 px-2'>
+          <fieldset className='border-2 border-cyan-500 dark:border-cyan-600 p-4 rounded-md'>
+            <legend className='font-bold text-lg text-cyan-700 dark:text-cyan-400 px-2'>
               Dados do Cliente
             </legend>
 
@@ -85,15 +89,21 @@ export function AgendamentoClinico() {
               <div className='form-group'>
                 <label
                   htmlFor='nomeCliente'
-                  className=' font-semibold text-gray-700 flex items-center gap-1'
+                  // CORRIGIDO: Texto da Label Adaptado
+                  className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
                 >
-                  <User size={16} className='text-cyan-500' /> Nome:
+                  <User
+                    size={16}
+                    className='text-cyan-500 dark:text-cyan-400'
+                  />{' '}
+                  Nome:
                 </label>
                 <input
                   type='text'
                   id='nomeCliente'
                   {...register('nomeCliente')}
-                  className='w-full p-2 border border-gray-300 rounded focus:border-cyan-500'
+                  // CORRIGIDO: Input e Foco Adaptados
+                  className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-cyan-500 dark:focus:border-cyan-400 dark:bg-gray-700 dark:text-gray-50'
                 />
                 {errors.nomeCliente && (
                   <p className='text-red-500 text-sm mt-1'>
@@ -105,16 +115,22 @@ export function AgendamentoClinico() {
               <div className='form-group'>
                 <label
                   htmlFor='telefone'
-                  className=' font-semibold text-gray-700 flex items-center gap-1'
+                  // CORRIGIDO: Texto da Label Adaptado
+                  className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
                 >
-                  <Phone size={16} className='text-cyan-500' /> Telefone:
+                  <Phone
+                    size={16}
+                    className='text-cyan-500 dark:text-cyan-400'
+                  />{' '}
+                  Telefone:
                 </label>
                 <input
                   type='tel'
                   id='telefone'
                   {...register('telefone')}
                   placeholder='(00) 00000-0000'
-                  className='w-full p-2 border border-gray-300 rounded focus:border-cyan-500'
+                  // CORRIGIDO: Input e Foco Adaptados
+                  className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-cyan-500 dark:focus:border-cyan-400 dark:bg-gray-700 dark:text-gray-50'
                 />
                 {errors.telefone && (
                   <p className='text-red-500 text-sm mt-1'>
@@ -125,23 +141,29 @@ export function AgendamentoClinico() {
             </div>
           </fieldset>
 
-          <fieldset className='border-2 border-cyan-500 p-4 rounded-md'>
-            <legend className='font-bold text-lg text-cyan-700 px-2'>
+          <fieldset className='border-2 border-cyan-500 dark:border-cyan-600 p-4 rounded-md'>
+            <legend className='font-bold text-lg text-cyan-700 dark:text-cyan-400 px-2'>
               Dados do Pet e Serviço
             </legend>
 
             <div className='form-group'>
               <label
                 htmlFor='nomePet'
-                className=' font-semibold text-gray-700 flex items-center gap-1'
+                // CORRIGIDO: Texto da Label Adaptado
+                className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
               >
-                <PawPrint size={16} className='text-cyan-500' /> Nome do Pet:
+                <PawPrint
+                  size={16}
+                  className='text-cyan-500 dark:text-cyan-400'
+                />{' '}
+                Nome do Pet:
               </label>
               <input
                 type='text'
                 id='nomePet'
                 {...register('nomePet')}
-                className='w-full p-2 border border-gray-300 rounded focus:border-cyan-500'
+                // CORRIGIDO: Input e Foco Adaptados
+                className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-cyan-500 dark:focus:border-cyan-400 dark:bg-gray-700 dark:text-gray-50'
               />
               {errors.nomePet && (
                 <p className='text-red-500 text-sm mt-1'>
@@ -153,14 +175,16 @@ export function AgendamentoClinico() {
             <div className='form-group'>
               <label
                 htmlFor='servico'
-                className='block font-semibold text-gray-700'
+                // CORRIGIDO: Texto da Label Adaptado
+                className='block font-semibold text-gray-700 dark:text-gray-300'
               >
                 Tipo de Serviço:
               </label>
               <select
                 id='servico'
                 {...register('servico')}
-                className='w-full p-2 border border-gray-300 rounded focus:border-cyan-500 bg-white'
+                // CORRIGIDO: Select e Foco Adaptados
+                className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-cyan-500 dark:focus:border-cyan-400 bg-white dark:bg-gray-700 dark:text-gray-50'
               >
                 <option value='consulta'>Consulta de Rotina</option>
                 <option value='exame'>Exame Específico</option>
@@ -175,8 +199,8 @@ export function AgendamentoClinico() {
             </div>
           </fieldset>
 
-          <fieldset className='border-2 border-cyan-500 p-4 rounded-md'>
-            <legend className='font-bold text-lg text-cyan-700 px-2'>
+          <fieldset className='border-2 border-cyan-500 dark:border-cyan-600 p-4 rounded-md'>
+            <legend className='font-bold text-lg text-cyan-700 dark:text-cyan-400 px-2'>
               Data e Hora
             </legend>
 
@@ -184,15 +208,21 @@ export function AgendamentoClinico() {
               <div className='form-group'>
                 <label
                   htmlFor='data'
-                  className=' font-semibold text-gray-700 flex items-center gap-1'
+                  // CORRIGIDO: Texto da Label Adaptado
+                  className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
                 >
-                  <CalendarDays size={16} className='text-cyan-500' /> Data:
+                  <CalendarDays
+                    size={16}
+                    className='text-cyan-500 dark:text-cyan-400'
+                  />{' '}
+                  Data:
                 </label>
                 <input
                   type='date'
                   id='data'
                   {...register('data')}
-                  className='w-full p-2 border border-gray-300 rounded focus:border-cyan-500'
+                  // CORRIGIDO: Input e Foco Adaptados
+                  className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-cyan-500 dark:focus:border-cyan-400 dark:bg-gray-700 dark:text-gray-50'
                 />
                 {errors.data && (
                   <p className='text-red-500 text-sm mt-1'>
@@ -204,15 +234,21 @@ export function AgendamentoClinico() {
               <div className='form-group'>
                 <label
                   htmlFor='hora'
-                  className=' font-semibold text-gray-700 flex items-center gap-1'
+                  // CORRIGIDO: Texto da Label Adaptado
+                  className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
                 >
-                  <Clock size={16} className='text-cyan-500' /> Hora:
+                  <Clock
+                    size={16}
+                    className='text-cyan-500 dark:text-cyan-400'
+                  />{' '}
+                  Hora:
                 </label>
                 <input
                   type='time'
                   id='hora'
                   {...register('hora')}
-                  className='w-full p-2 border border-gray-300 rounded focus:border-cyan-500'
+                  // CORRIGIDO: Input e Foco Adaptados
+                  className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-cyan-500 dark:focus:border-cyan-400 dark:bg-gray-700 dark:text-gray-50'
                 />
                 {errors.hora && (
                   <p className='text-red-500 text-sm mt-1'>
@@ -226,17 +262,22 @@ export function AgendamentoClinico() {
           <div className='form-group'>
             <label
               htmlFor='observacoes'
-              className=' font-semibold text-gray-700 flex items-center gap-1'
+              // CORRIGIDO: Texto da Label Adaptado
+              className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
             >
-              <MessageSquare size={16} className='text-cyan-500' /> Observações
-              (Opcional):
+              <MessageSquare
+                size={16}
+                className='text-cyan-500 dark:text-cyan-400'
+              />{' '}
+              Observações (Opcional):
             </label>
             <textarea
               id='observacoes'
               rows={3}
               {...register('observacoes')}
               placeholder='Ex: Suspeita de dor na pata traseira. Medicamento de uso contínuo.'
-              className='w-full p-2 border border-gray-300 rounded focus:border-cyan-500'
+              // CORRIGIDO: Input e Foco Adaptados
+              className='w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:border-cyan-500 dark:focus:border-cyan-400 dark:bg-gray-700 dark:text-gray-50'
             ></textarea>
             {errors.observacoes && (
               <p className='text-red-500 text-sm mt-1'>
@@ -247,7 +288,8 @@ export function AgendamentoClinico() {
 
           <button
             type='submit'
-            className='w-full p-3 bg-cyan-500 text-white font-bold rounded-md hover:bg-cyan-600 transition'
+            // CORRIGIDO: Botão e Hover Adaptados
+            className='w-full p-3 bg-cyan-500 dark:bg-cyan-600 text-white font-bold rounded-md hover:bg-cyan-600 dark:hover:bg-cyan-700 transition'
           >
             Agendar Consulta
           </button>
