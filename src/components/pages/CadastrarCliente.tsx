@@ -139,7 +139,7 @@ export default function App() {
                   <Mail
                     size={16}
                     className='text-cyan-500 dark:text-cyan-400'
-                  />{' '}
+                  />
                   E-mail:
                 </label>
                 {/* Input adaptado (cores e foco) */}
@@ -147,6 +147,7 @@ export default function App() {
                   type='email'
                   id='email'
                   {...register('email')}
+                  placeholder='Ex: email@gmail.com'
                   className='w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded focus:border-cyan-500 dark:focus:border-cyan-400'
                 />
                 {errors.email && (
@@ -165,7 +166,7 @@ export default function App() {
                   <Phone
                     size={16}
                     className='text-cyan-500 dark:text-cyan-400'
-                  />{' '}
+                  />
                   Telefone:
                 </label>
                 {/* Input adaptado (cores e foco) */}

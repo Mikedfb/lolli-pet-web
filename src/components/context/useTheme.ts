@@ -10,5 +10,5 @@ export const useTheme = (): ThemeContextProps => {
     throw new Error('useTheme deve ser usado dentro de um ThemeProvider');
   }
 
-  return context as ThemeContextProps;
+  return context;
 };

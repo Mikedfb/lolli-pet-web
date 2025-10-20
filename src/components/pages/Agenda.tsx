@@ -190,7 +190,7 @@ export function Agenda() {
 
   // 1. Função Mock para Cancelamento
   const handleCancel = (id: string) => {
-    const confirmacao = window.confirm(
+    const confirmacao = globalThis.confirm(
       `Tem certeza que deseja cancelar o agendamento ${id}?`,
     );
     if (confirmacao) {

@@ -19,14 +19,14 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // 1. CORREÇÃO DE DARK MODE: setAttribute
   useEffect(() => {
     // Garante que o código rode apenas no lado do cliente
-    if (typeof window === 'undefined') return;
+    if (typeof globalThis === 'undefined') return;
     console.log('APLICANDO TEMA:', theme); // <<< Adicione esta linha
 
     // Se este console.log aparecer (como em),
     // o JS está funcionando; o problema é CSS/compilação.
     // console.log('APLICANDO TEMA:', theme);
 
-    const root = window.document.documentElement; // A tag <html>
+    const root = globalThis.document.documentElement; // A tag <html>
 
     // setAttribute resolve o erro de classes conflitantes.
     root.setAttribute('class', theme);
