@@ -8,10 +8,7 @@ const PetSchema = z.object({
 
 export const cadastroClienteSchemas = z.object({
   nome: z.string().min(3, 'O nome completo é obrigatório.'),
-  email: z
-    .string()
-    .email('Formato de e-mail inválido.')
-    .min(1, 'O e-mail é obrigatório.'),
+  email: z.email('E-mail inválido.').min(1, 'O e-mail é obrigatório.'),
   telefone: z
     .string()
     .regex(

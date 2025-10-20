@@ -22,9 +22,10 @@ const petSchema = z.object({
 // --- ESQUEMA ZOD DO CLIENTE ---
 const cadastrarClienteSchema = z.object({
   nome: z.string().min(1, 'O nome completo do cliente é obrigatório.'),
-  email: z.string().email('E-mail inválido.').min(1, 'O e-mail é obrigatório.'),
+  email: z.email('E-mail inválido.').min(1, 'O e-mail é obrigatório.'),
   telefone: z
     .string()
+    .min(1, 'O telefone é obrigatório')
     .regex(
       /^\(\d{2}\)\s?\d{4,5}-\d{4}$/,
       'Telefone inválido (Ex: (00) 00000-0000).',
