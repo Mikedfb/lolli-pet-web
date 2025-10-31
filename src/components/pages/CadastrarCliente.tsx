@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   UserPlus,
   User,
@@ -49,6 +50,7 @@ export default function App() {
     register,
     handleSubmit,
     control,
+    reset,
     formState: { errors },
   } = useForm<CadastrarClienteFormData>({
     resolver: zodResolver(cadastrarClienteSchema),
@@ -67,14 +69,66 @@ export default function App() {
     name: 'pets',
   });
 
-  function onSubmit(data: CadastrarClienteFormData) {
-    console.log('Cliente e Pets Cadastrados:', data);
-    // Substituído alert() por console.log para seguir as diretrizes.
-    console.log(
-      `Cliente ${data.nome} cadastrado com sucesso, com ${data.pets.length} pet(s)!`,
-    );
-    // Lógica de API aqui
-  }
+  // Estados para envio ao backend
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Envia os dados para o backend como JSON
+  const onSubmit = async (data: CadastrarClienteFormData) => {
+    setIsSubmitting(true);
+    setServerError(null);
+    setSuccessMessage(null);
+
+    // Use uma variável de ambiente Vite (opcional) ou fallback
+    const apiUrl =
+      (import.meta as unknown as { env?: { VITE_API_URL?: string } }).env
+        ?.VITE_API_URL || 'http://localhost:4000/api/clientes';
+
+    try {
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        // Tente ler json com mensagem de erro ou texto simples
+        let message = `Erro ao cadastrar (status ${res.status})`;
+        try {
+          const json: unknown = await res.json();
+          if (json && typeof json === 'object' && 'message' in json) {
+            const msg = (json as { message?: unknown }).message;
+            if (typeof msg === 'string') message = msg;
+          }
+        } catch {
+          const text = await res.text();
+          if (text) message = text;
+        }
+        setServerError(message);
+        return;
+      }
+
+      // Sucesso
+      const result = await res.json().catch(() => null);
+      setSuccessMessage('Cliente cadastrado com sucesso.');
+      console.log('Resposta do servidor:', result ?? 'sem conteúdo');
+      // Reset no formulário para estado inicial
+      reset({
+        nome: '',
+        email: '',
+        telefone: '',
+        pets: [{ nome: '', especie: '', raca: '' }],
+      });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setServerError(`Erro de rede: ${message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     // Fundo da página com suporte a Dark Mode (dark:bg-gray-900)
@@ -96,6 +150,17 @@ export default function App() {
           // Fundo do formulário adaptado (dark:bg-gray-800)
           className='space-y-6 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 transition-colors duration-500'
         >
+          {/* Mensagens de sucesso / erro do servidor */}
+          {serverError && (
+            <div className='p-3 mb-2 bg-red-50 dark:bg-red-900 text-red-700 rounded'>
+              {serverError}
+            </div>
+          )}
+          {successMessage && (
+            <div className='p-3 mb-2 bg-green-50 dark:bg-green-900 text-green-700 rounded'>
+              {successMessage}
+            </div>
+          )}
           {/* Dados do Cliente */}
           <fieldset className='border-2 border-cyan-500 p-4 rounded-md'>
             {/* Legenda adaptada */}
@@ -311,10 +376,11 @@ export default function App() {
 
           <button
             type='submit'
+            disabled={isSubmitting}
             // Botão de Submissão adaptado
-            className='w-full p-3 bg-pink-500 dark:bg-pink-600 text-white font-bold rounded-md hover:bg-pink-600 dark:hover:bg-pink-700 transition text-lg'
+            className='w-full p-3 bg-pink-500 dark:bg-pink-600 text-white font-bold rounded-md hover:bg-pink-600 dark:hover:bg-pink-700 transition text-lg disabled:opacity-60'
           >
-            Cadastrar Cliente e Pets
+            {isSubmitting ? 'Enviando...' : 'Cadastrar Cliente e Pets'}
           </button>
         </form>
       </div>
