@@ -11,22 +11,74 @@ import { Agenda } from './components/pages/Agenda';
 import Prontuario from './components/pages/Prontuario';
 import { NotFound } from './components/pages/NotFound';
 
+// Páginas de autenticação
+import Login from './components/pages/Login';
+import Signup from './components/pages/Signup';
+
+// Context de autenticação
+import { AuthProvider } from './components/context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+
 export function App() {
   return (
-    <div className='className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-500'>
-      <Heading />
-      <main className='flex-1'>
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/cadastrar-cliente' element={<CadastrarCliente />} />
-          <Route path='/agendamento-clinico' element={<AgendamentoClinico />} />
-          <Route path='/agendamento-petshop' element={<AgendamentoPetshop />} />
-          <Route path='/agenda' element={<Agenda />} />
-          <Route path='/prontuario' element={<Prontuario />} />
-          <Route path='*' element={<NotFound />} />
-        </Routes>
-      </main>
-      <Footer />
-    </div>
+    <AuthProvider>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-500">
+        <Heading />
+        <main className="flex-1">
+          <Routes>
+            {/* Rotas Públicas */}
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+
+            {/* Rotas Protegidas - Requerem Autenticação */}
+            <Route
+              path="/cadastrar-cliente"
+              element={
+                <ProtectedRoute>
+                  <CadastrarCliente />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/agendamento-clinico"
+              element={
+                <ProtectedRoute>
+                  <AgendamentoClinico />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/agendamento-petshop"
+              element={
+                <ProtectedRoute>
+                  <AgendamentoPetshop />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/agenda"
+              element={
+                <ProtectedRoute>
+                  <Agenda />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/prontuario"
+              element={
+                <ProtectedRoute>
+                  <Prontuario />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Rota 404 */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </AuthProvider>
   );
 }
