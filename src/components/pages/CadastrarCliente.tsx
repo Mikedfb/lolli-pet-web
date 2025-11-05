@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   UserPlus,
   User,
@@ -12,6 +12,8 @@ import {
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { cadastrarCliente } from '../../services/api';
+import type { ApiError } from '../../services/api';
 
 // --- ESQUEMA ZOD DOS PETS ---
 const petSchema = z.object({
@@ -75,46 +77,25 @@ export default function App() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Envia os dados para o backend como JSON
+  // Agora usa o serviço de API centralizado que inclui automaticamente o token JWT
   const onSubmit = async (data: CadastrarClienteFormData) => {
     setIsSubmitting(true);
     setServerError(null);
     setSuccessMessage(null);
 
-    // Use uma variável de ambiente Vite (opcional) ou fallback
-    const apiUrl =
-      (import.meta as unknown as { env?: { VITE_API_URL?: string } }).env
-        ?.VITE_API_URL || 'http://localhost:4000/api/clientes';
+    console.log('[CadastrarCliente] Enviando dados do cliente:', data);
 
     try {
-      const res = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!res.ok) {
-        // Tente ler json com mensagem de erro ou texto simples
-        let message = `Erro ao cadastrar (status ${res.status})`;
-        try {
-          const json: unknown = await res.json();
-          if (json && typeof json === 'object' && 'message' in json) {
-            const msg = (json as { message?: unknown }).message;
-            if (typeof msg === 'string') message = msg;
-          }
-        } catch {
-          const text = await res.text();
-          if (text) message = text;
-        }
-        setServerError(message);
-        return;
-      }
+      // Usa a função cadastrarCliente do serviço de API
+      // Isso enviará: POST /api/clientes
+      // Com header: Authorization: Bearer {token}
+      // E body: { nome, email, telefone, pets: [...] }
+      await cadastrarCliente(data);
 
       // Sucesso
-      const result = await res.json().catch(() => null);
       setSuccessMessage('Cliente cadastrado com sucesso.');
-      console.log('Resposta do servidor:', result ?? 'sem conteúdo');
+      console.log('[CadastrarCliente] Cliente cadastrado com sucesso!');
+
       // Reset no formulário para estado inicial
       reset({
         nome: '',
@@ -122,9 +103,10 @@ export default function App() {
         telefone: '',
         pets: [{ nome: '', especie: '', raca: '' }],
       });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      setServerError(`Erro de rede: ${message}`);
+    } catch (err) {
+      console.error('[CadastrarCliente] Erro ao cadastrar cliente:', err);
+      const apiError = err as ApiError;
+      setServerError(apiError.message || 'Erro ao cadastrar cliente.');
     } finally {
       setIsSubmitting(false);
     }

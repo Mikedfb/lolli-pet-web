@@ -1,5 +1,5 @@
 import Logo from '../assets/Logo.svg';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Home as HomeIcon,
   UserPlus,
@@ -11,14 +11,20 @@ import {
   X,
   Sun,
   Moon,
+  LogOut,
+  User,
+  LogIn,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useTheme } from './context/useTheme';
+import { useAuth } from './context/useAuth';
 
 export function Heading() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const { theme, toggleTheme } = useTheme(); // 4. Usa o hook para tema e alternância
+  const { user, isAuthenticated, logout } = useAuth(); // Hook de autenticação
 
   // Define classes base para links, agora incluindo estilos para o tema escuro
   const linkBaseClass =
@@ -37,6 +43,12 @@ export function Heading() {
 
   const handleLinkClick = () => {
     setIsOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsOpen(false);
+    navigate('/login');
   };
 
   return (
@@ -61,48 +73,52 @@ export function Heading() {
             <HomeIcon size={16} /> HOME
           </Link>
 
-          <Link
-            to='/cadastrar-cliente'
-            className={getLinkClass('/cadastrar-cliente')}
-          >
-            <UserPlus size={16} /> CADASTRO
-          </Link>
+          {isAuthenticated && (
+            <>
+              <Link
+                to='/cadastrar-cliente'
+                className={getLinkClass('/cadastrar-cliente')}
+              >
+                <UserPlus size={16} /> CADASTRO
+              </Link>
 
-          <Link
-            to='/agendamento-clinico'
-            className={getLinkClass('/agendamento-clinico')}
-          >
-            {/* Ícones específicos precisam de dark:text se suas cores forem fixas */}
-            <Stethoscope
-              size={16}
-              className='text-cyan-600 dark:text-cyan-400'
-            />{' '}
-            CLÍNICO
-          </Link>
+              <Link
+                to='/agendamento-clinico'
+                className={getLinkClass('/agendamento-clinico')}
+              >
+                {/* Ícones específicos precisam de dark:text se suas cores forem fixas */}
+                <Stethoscope
+                  size={16}
+                  className='text-cyan-600 dark:text-cyan-400'
+                />{' '}
+                CLÍNICO
+              </Link>
 
-          <Link
-            to='/agendamento-petshop'
-            className={getLinkClass('/agendamento-petshop')}
-          >
-            <Bath size={16} className='text-pink-600 dark:text-pink-400' />{' '}
-            PETSHOP
-          </Link>
+              <Link
+                to='/agendamento-petshop'
+                className={getLinkClass('/agendamento-petshop')}
+              >
+                <Bath size={16} className='text-pink-600 dark:text-pink-400' />{' '}
+                PETSHOP
+              </Link>
 
-          <Link to='/agenda' className={getLinkClass('/agenda')}>
-            <Calendar
-              size={16}
-              className='text-yellow-600 dark:text-yellow-400'
-            />{' '}
-            AGENDA
-          </Link>
+              <Link to='/agenda' className={getLinkClass('/agenda')}>
+                <Calendar
+                  size={16}
+                  className='text-yellow-600 dark:text-yellow-400'
+                />{' '}
+                AGENDA
+              </Link>
 
-          <Link to='/prontuario' className={getLinkClass('/prontuario')}>
-            <ClipboardList size={16} className='dark:text-gray-200' />{' '}
-            PRONTUÁRIO
-          </Link>
+              <Link to='/prontuario' className={getLinkClass('/prontuario')}>
+                <ClipboardList size={16} className='dark:text-gray-200' />{' '}
+                PRONTUÁRIO
+              </Link>
+            </>
+          )}
         </nav>
 
-        {/* Botões de Ação (Alternância de Tema + Menu Mobile) */}
+        {/* Botões de Ação (Alternância de Tema + Auth + Menu Mobile) */}
         <div className='flex items-center gap-3'>
           {/* 7. BOTÃO DE TEMA */}
           <button
@@ -117,6 +133,47 @@ export function Heading() {
               <Sun className='h-6 w-6' />
             )}
           </button>
+
+          {/* Botões de Autenticação (Desktop) */}
+          <div className='hidden md:flex items-center gap-3'>
+            {isAuthenticated ? (
+              // Usuário autenticado - mostra nome e botão de logout
+              <>
+                <div className='flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-cyan-50 to-pink-50 dark:from-cyan-900/20 dark:to-pink-900/20 rounded-lg border border-cyan-200 dark:border-cyan-700'>
+                  <User size={16} className='text-cyan-600 dark:text-cyan-400' />
+                  <span className='text-sm font-semibold text-gray-700 dark:text-gray-200'>
+                    {user?.nome}
+                  </span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className='flex items-center gap-2 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-200'
+                  aria-label='Sair'
+                >
+                  <LogOut size={16} />
+                  <span className='text-sm font-semibold'>SAIR</span>
+                </button>
+              </>
+            ) : (
+              // Usuário não autenticado - mostra botões de login e signup
+              <>
+                <Link
+                  to='/login'
+                  className='flex items-center gap-2 px-3 py-2 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-lg transition-colors duration-200 border border-cyan-600 dark:border-cyan-400'
+                >
+                  <LogIn size={16} />
+                  <span className='text-sm font-semibold'>ENTRAR</span>
+                </Link>
+                <Link
+                  to='/signup'
+                  className='flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600 text-white rounded-lg transition-colors duration-200'
+                >
+                  <UserPlus size={16} />
+                  <span className='text-sm font-semibold'>CADASTRAR</span>
+                </Link>
+              </>
+            )}
+          </div>
 
           {/* Botão do Menu Mobile - Visível apenas em telas pequenas */}
           <div className='md:hidden'>
@@ -144,56 +201,101 @@ export function Heading() {
           <Link to='/' onClick={handleLinkClick} className={getLinkClass('/')}>
             <HomeIcon size={16} /> HOME
           </Link>
-          {/* ... (Outros links mobile) ... */}
-          <Link
-            to='/cadastrar-cliente'
-            onClick={handleLinkClick}
-            className={getLinkClass('/cadastrar-cliente')}
-          >
-            <UserPlus size={16} /> CADASTRO
-          </Link>
 
-          <Link
-            to='/agendamento-clinico'
-            onClick={handleLinkClick}
-            className={getLinkClass('/agendamento-clinico')}
-          >
-            <Stethoscope
-              size={16}
-              className='text-cyan-600 dark:text-cyan-400'
-            />{' '}
-            CLÍNICO
-          </Link>
+          {isAuthenticated ? (
+            <>
+              {/* Links protegidos - apenas para usuários autenticados */}
+              <Link
+                to='/cadastrar-cliente'
+                onClick={handleLinkClick}
+                className={getLinkClass('/cadastrar-cliente')}
+              >
+                <UserPlus size={16} /> CADASTRO
+              </Link>
 
-          <Link
-            to='/agendamento-petshop'
-            onClick={handleLinkClick}
-            className={getLinkClass('/agendamento-petshop')}
-          >
-            <Bath size={16} className='text-pink-600 dark:text-pink-400' />{' '}
-            PETSHOP
-          </Link>
+              <Link
+                to='/agendamento-clinico'
+                onClick={handleLinkClick}
+                className={getLinkClass('/agendamento-clinico')}
+              >
+                <Stethoscope
+                  size={16}
+                  className='text-cyan-600 dark:text-cyan-400'
+                />{' '}
+                CLÍNICO
+              </Link>
 
-          <Link
-            to='/agenda'
-            onClick={handleLinkClick}
-            className={getLinkClass('/agenda')}
-          >
-            <Calendar
-              size={16}
-              className='text-yellow-600 dark:text-yellow-400'
-            />{' '}
-            AGENDA
-          </Link>
+              <Link
+                to='/agendamento-petshop'
+                onClick={handleLinkClick}
+                className={getLinkClass('/agendamento-petshop')}
+              >
+                <Bath size={16} className='text-pink-600 dark:text-pink-400' />{' '}
+                PETSHOP
+              </Link>
 
-          <Link
-            to='/prontuario'
-            onClick={handleLinkClick}
-            className={getLinkClass('/prontuario')}
-          >
-            <ClipboardList size={16} className='dark:text-gray-200' />{' '}
-            PRONTUÁRIO
-          </Link>
+              <Link
+                to='/agenda'
+                onClick={handleLinkClick}
+                className={getLinkClass('/agenda')}
+              >
+                <Calendar
+                  size={16}
+                  className='text-yellow-600 dark:text-yellow-400'
+                />{' '}
+                AGENDA
+              </Link>
+
+              <Link
+                to='/prontuario'
+                onClick={handleLinkClick}
+                className={getLinkClass('/prontuario')}
+              >
+                <ClipboardList size={16} className='dark:text-gray-200' />{' '}
+                PRONTUÁRIO
+              </Link>
+
+              {/* Divisor */}
+              <div className='border-t border-gray-200 dark:border-gray-700 my-2'></div>
+
+              {/* Info do usuário */}
+              <div className='flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-cyan-50 to-pink-50 dark:from-cyan-900/20 dark:to-pink-900/20 rounded-lg border border-cyan-200 dark:border-cyan-700'>
+                <User size={16} className='text-cyan-600 dark:text-cyan-400' />
+                <span className='text-sm font-semibold text-gray-700 dark:text-gray-200'>
+                  {user?.nome}
+                </span>
+              </div>
+
+              {/* Botão de Logout */}
+              <button
+                onClick={handleLogout}
+                className='flex items-center gap-2 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-200 w-full justify-center'
+              >
+                <LogOut size={16} />
+                <span className='text-sm font-semibold'>SAIR</span>
+              </button>
+            </>
+          ) : (
+            <>
+              {/* Botões de Login e Signup para usuários não autenticados */}
+              <Link
+                to='/login'
+                onClick={handleLinkClick}
+                className='flex items-center gap-2 px-3 py-2 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-lg transition-colors duration-200 border border-cyan-600 dark:border-cyan-400 justify-center'
+              >
+                <LogIn size={16} />
+                <span className='text-sm font-semibold'>ENTRAR</span>
+              </Link>
+              <Link
+                to='/signup'
+                onClick={handleLinkClick}
+                className='flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600 text-white rounded-lg transition-colors duration-200 justify-center'
+              >
+                <UserPlus size={16} />
+                <span className='text-sm font-semibold'>CADASTRAR</span>
+              </Link>
+            </>
+          )}
         </nav>
       )}
     </header>
