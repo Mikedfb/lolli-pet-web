@@ -35,8 +35,6 @@ export interface SignupData {
   nome: string;
   email: string;
   password: string;
-  crmv?: string;
-  especialidade?: string;
 }
 
 /**
