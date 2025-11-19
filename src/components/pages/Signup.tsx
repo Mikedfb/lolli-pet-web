@@ -14,7 +14,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Mail, Phone, Lock, UserPlus, AlertCircle } from 'lucide-react';
+import { User, Mail, Lock, UserPlus, AlertCircle } from 'lucide-react';
 import { signupSchema, type SignupFormData } from '../schemas/AuthSchemas';
 import { useAuth } from '../context/useAuth';
 import type { ApiError } from '../../services/api';
