@@ -12,7 +12,7 @@ import {
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { cadastrarCliente } from '../../services/api';
+import { cadastrarCliente, cadastrarPet } from '../../services/api';
 import type { ApiError } from '../../services/api';
 
 // --- ESQUEMA ZOD DOS PETS ---
@@ -24,15 +24,12 @@ const petSchema = z.object({
 
 // --- ESQUEMA ZOD DO CLIENTE ---
 const cadastrarClienteSchema = z.object({
-  nome: z.string().min(1, 'O nome completo do cliente é obrigatório.'),
-  email: z.email('E-mail inválido.').min(1, 'O e-mail é obrigatório.'),
+  nome: z.string().min(1, 'O nome do cliente é obrigatório.'),
+  sobrenome: z.string().optional(),
+  email: z.string().email('E-mail inválido.').min(1, 'O e-mail é obrigatório.'),
   telefone: z
     .string()
-    .min(1, 'O telefone é obrigatório')
-    .regex(
-      /^\(\d{2}\)\s?\d{4,5}-\d{4}$/,
-      'Telefone inválido (Ex: (00) 00000-0000).',
-    ),
+    .optional(),
 
   // Array de Pets - Deve ter pelo menos 1 item
   pets: z
@@ -58,6 +55,7 @@ export default function App() {
     resolver: zodResolver(cadastrarClienteSchema),
     defaultValues: {
       nome: '',
+      sobrenome: '',
       email: '',
       telefone: '',
       // Inicializa com um Pet obrigatório
@@ -77,7 +75,7 @@ export default function App() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Envia os dados para o backend como JSON
-  // Agora usa o serviço de API centralizado que inclui automaticamente o token JWT
+  // Fluxo: 1. Criar cliente -> 2. Criar cada pet com cliente_id
   const onSubmit = async (data: CadastrarClienteFormData) => {
     setIsSubmitting(true);
     setServerError(null);
@@ -86,25 +84,44 @@ export default function App() {
     console.log('[CadastrarCliente] Enviando dados do cliente:', data);
 
     try {
-      // Usa a função cadastrarCliente do serviço de API
-      // Isso enviará: POST /api/clientes
-      // Com header: Authorization: Bearer {token}
-      // E body: { nome, email, telefone, pets: [...] }
-      await cadastrarCliente(data);
+      // PASSO 1: Criar o cliente
+      const clienteData = {
+        nome: data.nome,
+        sobrenome: data.sobrenome || undefined,
+        email: data.email,
+        telefone: data.telefone || undefined,
+      };
+
+      const clienteCriado = await cadastrarCliente(clienteData);
+      console.log('[CadastrarCliente] Cliente criado:', clienteCriado);
+
+      // PASSO 2: Criar cada pet associado ao cliente
+      for (const pet of data.pets) {
+        const petData = {
+          nome: pet.nome,
+          especie: pet.especie,
+          raca: pet.raca || undefined,
+          cliente_id: clienteCriado.id,
+        };
+
+        const petCriado = await cadastrarPet(petData);
+        console.log('[CadastrarCliente] Pet criado:', petCriado);
+      }
 
       // Sucesso
-      setSuccessMessage('Cliente cadastrado com sucesso.');
-      console.log('[CadastrarCliente] Cliente cadastrado com sucesso!');
+      setSuccessMessage(`Cliente e ${data.pets.length} pet(s) cadastrados com sucesso!`);
+      console.log('[CadastrarCliente] Cadastro completo!');
 
       // Reset no formulário para estado inicial
       reset({
         nome: '',
+        sobrenome: '',
         email: '',
         telefone: '',
         pets: [{ nome: '', especie: '', raca: '' }],
       });
     } catch (err) {
-      console.error('[CadastrarCliente] Erro ao cadastrar cliente:', err);
+      console.error('[CadastrarCliente] Erro ao cadastrar:', err);
       const apiError = err as ApiError;
       setServerError(apiError.message || 'Erro ao cadastrar cliente.');
     } finally {
@@ -150,8 +167,8 @@ export default function App() {
               Dados do Cliente
             </legend>
 
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-              <div className='form-group md:col-span-3'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <div className='form-group'>
                 {/* Label adaptado */}
                 <label
                   htmlFor='nome'
@@ -161,7 +178,7 @@ export default function App() {
                     size={16}
                     className='text-cyan-500 dark:text-cyan-400'
                   />{' '}
-                  Nome Completo:
+                  Nome:
                 </label>
                 {/* Input adaptado (cores e foco) */}
                 <input
@@ -173,6 +190,30 @@ export default function App() {
                 {errors.nome && (
                   <p className='text-red-500 text-sm mt-1'>
                     {errors.nome.message}
+                  </p>
+                )}
+              </div>
+
+              <div className='form-group'>
+                <label
+                  htmlFor='sobrenome'
+                  className=' font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1'
+                >
+                  <User
+                    size={16}
+                    className='text-cyan-500 dark:text-cyan-400'
+                  />{' '}
+                  Sobrenome:
+                </label>
+                <input
+                  type='text'
+                  id='sobrenome'
+                  {...register('sobrenome')}
+                  className='w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded focus:border-cyan-500 dark:focus:border-cyan-400'
+                />
+                {errors.sobrenome && (
+                  <p className='text-red-500 text-sm mt-1'>
+                    {errors.sobrenome.message}
                   </p>
                 )}
               </div>

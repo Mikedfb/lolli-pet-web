@@ -65,6 +65,52 @@ export interface AuthResponse {
 }
 
 /**
+ * Interface para dados do cliente
+ */
+export interface Cliente {
+  id: number;
+  nome: string;
+  sobrenome?: string;
+  email: string;
+  telefone?: string;
+}
+
+/**
+ * Interface para dados do pet
+ */
+export interface Pet {
+  id: number;
+  nome: string;
+  especie?: string;
+  raca?: string;
+  cliente_id: number;
+  cliente?: {
+    id: number;
+    nome: string;
+    email: string;
+  };
+}
+
+/**
+ * Interface para dados do agendamento
+ */
+export interface Agendamento {
+  id: number;
+  servico: 'petshop' | 'clinico';
+  data_hora: string;
+  pet_id: number;
+  veterinario_id?: number;
+  observacoes?: string;
+  status?: 'agendado' | 'confirmado' | 'cancelado' | 'concluido';
+  pet?: Pet;
+  veterinario?: {
+    id: number;
+    nome: string;
+    email: string;
+  };
+}
+
+/**
  * Obtém o token JWT do localStorage
  */
 export const getToken = (): string | null => {
@@ -180,8 +226,20 @@ const apiRequest = async <T>(
 
     // Se a resposta não for OK (status 200-299), lança um erro
     if (!response.ok) {
+      // Backend pode retornar erros como { errors: [...] } ou { err: [...] }
+      let errorMessage = 'Erro ao comunicar com o servidor';
+      if (data?.errors && Array.isArray(data.errors)) {
+        errorMessage = data.errors.join(', ');
+      } else if (data?.err && Array.isArray(data.err)) {
+        errorMessage = data.err.join(', ');
+      } else if (data?.message) {
+        errorMessage = data.message;
+      } else if (typeof data === 'string') {
+        errorMessage = data;
+      }
+
       const error: ApiError = {
-        message: data?.message || data || 'Erro ao comunicar com o servidor',
+        message: errorMessage,
         status: response.status,
         details: data,
       };
@@ -252,7 +310,7 @@ export const login = async (data: LoginData): Promise<AuthResponse> => {
   try {
     // PASSO 1: Faz login e recebe apenas o token
     const tokenResponse = await apiRequest<TokenResponse>(
-      '/token',
+      '/token/',
       {
         method: 'POST',
         body: JSON.stringify(data),
@@ -300,7 +358,7 @@ export const signup = async (data: SignupData): Promise<AuthResponse> => {
 
   // Cria o veterinário
   await apiRequest<UserData>(
-    '/veterinarios',
+    '/veterinarios/',
     {
       method: 'POST',
       body: JSON.stringify(data),
@@ -368,18 +426,38 @@ export const revalidateAuth = async (): Promise<boolean> => {
 // ============================================================
 
 /**
- * Cadastra um novo cliente com seus pets
+ * Interface para criar cliente
+ */
+export interface CriarClienteData {
+  nome: string;
+  sobrenome?: string;
+  email: string;
+  telefone?: string;
+}
+
+/**
+ * Interface para criar pet
+ */
+export interface CriarPetData {
+  nome: string;
+  especie?: string;
+  raca?: string;
+  cliente_id: number;
+}
+
+/**
+ * Cadastra um novo cliente
  *
  * Envia para: POST /clientes
  * Headers: Authorization: Bearer {token}
- * Body: { nome, email, telefone, pets: [...] }
+ * Body: { nome, sobrenome, email, telefone }
  *
- * @param data - Dados do cliente e pets
+ * @param data - Dados do cliente
  */
-export const cadastrarCliente = async (data: unknown): Promise<unknown> => {
+export const cadastrarCliente = async (data: CriarClienteData): Promise<Cliente> => {
   console.log('[CLIENTES] Cadastrando novo cliente');
 
-  return apiRequest(
+  return apiRequest<Cliente>(
     '/clientes',
     {
       method: 'POST',
@@ -396,15 +474,33 @@ export const cadastrarCliente = async (data: unknown): Promise<unknown> => {
  * Headers: Authorization: Bearer {token}
  * Retorna: Array de clientes
  */
-export const listarClientes = async (): Promise<unknown[]> => {
+export const listarClientes = async (): Promise<Cliente[]> => {
   console.log('[CLIENTES] Listando clientes');
 
-  return apiRequest(
+  return apiRequest<Cliente[]>(
     '/clientes',
     {
       method: 'GET',
     },
     true // Inclui token de autenticação
+  );
+};
+
+/**
+ * Busca um cliente por ID
+ *
+ * Envia para: GET /clientes/:id
+ * Headers: Authorization: Bearer {token}
+ */
+export const buscarCliente = async (id: number): Promise<Cliente> => {
+  console.log('[CLIENTES] Buscando cliente:', id);
+
+  return apiRequest<Cliente>(
+    `/clientes/${id}`,
+    {
+      method: 'GET',
+    },
+    true
   );
 };
 
@@ -417,12 +513,12 @@ export const listarClientes = async (): Promise<unknown[]> => {
  *
  * Envia para: GET /pets
  * Headers: Authorization: Bearer {token}
- * Retorna: Array de pets
+ * Retorna: Array de pets com associação cliente
  */
-export const listarPets = async (): Promise<unknown[]> => {
+export const listarPets = async (): Promise<Pet[]> => {
   console.log('[PETS] Listando pets');
 
-  return apiRequest(
+  return apiRequest<Pet[]>(
     '/pets',
     {
       method: 'GET',
@@ -431,9 +527,59 @@ export const listarPets = async (): Promise<unknown[]> => {
   );
 };
 
+/**
+ * Cadastra um novo pet
+ *
+ * Envia para: POST /pets
+ * Headers: Authorization: Bearer {token}
+ * Body: { nome, especie, raca, cliente_id }
+ *
+ * @param data - Dados do pet
+ */
+export const cadastrarPet = async (data: CriarPetData): Promise<Pet> => {
+  console.log('[PETS] Cadastrando novo pet');
+
+  return apiRequest<Pet>(
+    '/pets',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    true // Inclui token de autenticação
+  );
+};
+
+/**
+ * Busca um pet por ID
+ *
+ * Envia para: GET /pets/:id
+ * Headers: Authorization: Bearer {token}
+ */
+export const buscarPet = async (id: number): Promise<Pet> => {
+  console.log('[PETS] Buscando pet:', id);
+
+  return apiRequest<Pet>(
+    `/pets/${id}`,
+    {
+      method: 'GET',
+    },
+    true
+  );
+};
+
 // ============================================================
 // ENDPOINTS DE AGENDAMENTOS
 // ============================================================
+
+/**
+ * Interface para criar agendamento
+ */
+export interface CriarAgendamentoData {
+  pet_id: number;
+  data_hora: string;
+  observacoes?: string;
+  status?: 'agendado' | 'confirmado' | 'cancelado' | 'concluido';
+}
 
 /**
  * Cria um agendamento clínico
@@ -444,14 +590,14 @@ export const listarPets = async (): Promise<unknown[]> => {
  *
  * @param data - Dados do agendamento clínico
  */
-export const agendarClinico = async (data: unknown): Promise<unknown> => {
+export const agendarClinico = async (data: CriarAgendamentoData): Promise<Agendamento> => {
   console.log('[AGENDAMENTO] Criando agendamento clínico');
 
-  return apiRequest(
+  return apiRequest<Agendamento>(
     '/agendamentos',
     {
       method: 'POST',
-      body: JSON.stringify({ ...(data as Record<string, unknown>), servico: 'clinico' }),
+      body: JSON.stringify({ ...data, servico: 'clinico' }),
     },
     true // Inclui token de autenticação
   );
@@ -466,14 +612,14 @@ export const agendarClinico = async (data: unknown): Promise<unknown> => {
  *
  * @param data - Dados do agendamento petshop
  */
-export const agendarPetshop = async (data: unknown): Promise<unknown> => {
+export const agendarPetshop = async (data: CriarAgendamentoData): Promise<Agendamento> => {
   console.log('[AGENDAMENTO] Criando agendamento petshop');
 
-  return apiRequest(
+  return apiRequest<Agendamento>(
     '/agendamentos',
     {
       method: 'POST',
-      body: JSON.stringify({ ...(data as Record<string, unknown>), servico: 'petshop' }),
+      body: JSON.stringify({ ...data, servico: 'petshop' }),
     },
     true // Inclui token de autenticação
   );
@@ -484,12 +630,12 @@ export const agendarPetshop = async (data: unknown): Promise<unknown> => {
  *
  * Envia para: GET /agendamentos
  * Headers: Authorization: Bearer {token}
- * Retorna: Array de agendamentos
+ * Retorna: Array de agendamentos com associações pet e veterinario
  */
-export const listarAgendamentos = async (): Promise<unknown[]> => {
+export const listarAgendamentos = async (): Promise<Agendamento[]> => {
   console.log('[AGENDAMENTO] Listando agendamentos');
 
-  return apiRequest(
+  return apiRequest<Agendamento[]>(
     '/agendamentos',
     {
       method: 'GET',
@@ -503,14 +649,14 @@ export const listarAgendamentos = async (): Promise<unknown[]> => {
  *
  * Envia para: GET /agendamentos/:id
  * Headers: Authorization: Bearer {token}
- * Retorna: Dados do agendamento
+ * Retorna: Dados do agendamento com associações
  *
  * @param id - ID do agendamento
  */
-export const buscarAgendamento = async (id: number): Promise<unknown> => {
+export const buscarAgendamento = async (id: number): Promise<Agendamento> => {
   console.log('[AGENDAMENTO] Buscando agendamento:', id);
 
-  return apiRequest(
+  return apiRequest<Agendamento>(
     `/agendamentos/${id}`,
     {
       method: 'GET',
@@ -529,10 +675,10 @@ export const buscarAgendamento = async (id: number): Promise<unknown> => {
  * @param id - ID do agendamento
  * @param data - Dados para atualizar
  */
-export const atualizarAgendamento = async (id: number, data: unknown): Promise<unknown> => {
+export const atualizarAgendamento = async (id: number, data: Partial<CriarAgendamentoData>): Promise<Agendamento> => {
   console.log('[AGENDAMENTO] Atualizando agendamento:', id);
 
-  return apiRequest(
+  return apiRequest<Agendamento>(
     `/agendamentos/${id}`,
     {
       method: 'PUT',
@@ -550,10 +696,10 @@ export const atualizarAgendamento = async (id: number, data: unknown): Promise<u
  *
  * @param id - ID do agendamento
  */
-export const deletarAgendamento = async (id: number): Promise<unknown> => {
+export const deletarAgendamento = async (id: number): Promise<null> => {
   console.log('[AGENDAMENTO] Deletando agendamento:', id);
 
-  return apiRequest(
+  return apiRequest<null>(
     `/agendamentos/${id}`,
     {
       method: 'DELETE',
@@ -612,9 +758,12 @@ export default {
   // Clientes
   cadastrarCliente,
   listarClientes,
+  buscarCliente,
 
   // Pets
   listarPets,
+  cadastrarPet,
+  buscarPet,
 
   // Agendamentos
   agendarClinico,
