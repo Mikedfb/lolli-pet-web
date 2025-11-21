@@ -17,12 +17,14 @@ export const agendamentoClinicoSchema = z.object({
     .string()
     .min(3, 'O nome do cliente é obrigatório (mínimo 3 caracteres).'),
   telefone: z
-    .string()
-    .min(1, 'O telefone é obrigatório.') //  GARANTIA DE PREENCHIMENTO
-    .regex(
-      /^\d{10,11}$/,
-      'Telefone inválido (apenas números, 10 ou 11 dígitos).',
-    ),
+  .string()
+  .min(1, 'O telefone é obrigatório.')
+  // 1. Limpa tudo que não for número antes de validar
+  .transform((val) => val.replace(/\D/g, '')) 
+  // 2. Valida se sobraram 10 ou 11 números
+  .refine((val) => val.length >= 10 && val.length <= 11, { 
+    message: 'Telefone inválido (deve ter 10 ou 11 dígitos).',
+  }),
   nomePet: z.string().min(1, 'O nome do Pet é obrigatório.'), //  GARANTIA DE PREENCHIMENTO
 
   servico: z.enum(['consulta', 'exame', 'vacina', 'outro'], {

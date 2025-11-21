@@ -10,12 +10,14 @@ export const cadastroClienteSchemas = z.object({
   nome: z.string().min(3, 'O nome completo é obrigatório.'),
   email: z.email('E-mail inválido.').min(1, 'O e-mail é obrigatório.'),
   telefone: z
-    .string()
-    .regex(
-      /^\d{10,11}$/,
-      'Telefone inválido (apenas números, 10 ou 11 dígitos).',
-    )
-    .min(10, 'O telefone é obrigatório.'),
+  .string()
+  .min(1, 'O telefone é obrigatório.')
+  // 1. Limpa tudo que não for número antes de validar
+  .transform((val) => val.replace(/\D/g, '')) 
+  // 2. Valida se sobraram 10 ou 11 números
+  .refine((val) => val.length >= 10 && val.length <= 11, { 
+    message: 'Telefone inválido (deve ter 10 ou 11 dígitos).',
+  }),
 
   pets: z.array(PetSchema).min(1, 'É obrigatório cadastrar pelo menos um pet.'),
 });
