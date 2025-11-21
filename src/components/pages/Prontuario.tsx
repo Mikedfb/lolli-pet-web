@@ -37,72 +37,7 @@ interface Pet {
 
 // --- DADOS MOCKADOS PARA EXEMPLO (Mantidos) ---
 
-const mockPacientes: Pet[] = [
-  {
-    id: 'P001',
-    nome: 'Rex',
-    especie: 'Cachorro',
-    raca: 'Golden Retriever',
-    cliente: 'Ana Silva',
-    telefone: '(11) 98765-4321',
-    historico: [
-      {
-        id: 'H005',
-        data: '15/10/2025',
-        tipo: 'Banho',
-        descricao: 'Banho e secagem padrão.',
-        responsavel: 'Prof. João',
-        arquivos: [],
-      },
-      {
-        id: 'H004',
-        data: '10/09/2025',
-        tipo: 'Consulta',
-        descricao: 'Check-up de rotina. Peso normal, sem intercorrências.',
-        responsavel: 'Dr(a). Juliana',
-        arquivos: [],
-      },
-      {
-        id: 'H003',
-        data: '25/08/2025',
-        tipo: 'Vacina',
-        descricao: 'Vacina V8 anual aplicada.',
-        responsavel: 'Dr(a). Juliana',
-        arquivos: [{ nome: 'Cartão de Vacina.pdf', url: '#' }],
-      },
-    ],
-  },
-  {
-    id: 'P002',
-    nome: 'Miau',
-    especie: 'Gato',
-    raca: 'Siamês',
-    cliente: 'Carlos Souza',
-    telefone: '(21) 99887-7665',
-    historico: [
-      {
-        id: 'H002',
-        data: '01/10/2025',
-        tipo: 'Consulta',
-        descricao:
-          'Queixa de apatia e falta de apetite. Prescrito antibiótico por 7 dias.',
-        responsavel: 'Dr(a). Pedro',
-        arquivos: [
-          { nome: 'RaioX Abdominal.jpg', url: '#' },
-          { nome: 'Exame de Sangue.pdf', url: '#' },
-        ],
-      },
-      {
-        id: 'H001',
-        data: '15/09/2025',
-        tipo: 'Banho',
-        descricao: 'Banho hipoalergênico.',
-        responsavel: 'Prof. Fernanda',
-        arquivos: [],
-      },
-    ],
-  },
-];
+
 
 // ---  ADICIONAR HISTÓRICO ---
 
@@ -482,7 +417,6 @@ export default function App() {
       try {
         // Simular um atraso de 1 segundo (latência de rede)
         setTimeout(() => {
-          setPacientes(mockPacientes);
           setIsLoading(false);
         }, 1000);
       } catch (err) {
