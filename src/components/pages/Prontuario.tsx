@@ -22,8 +22,9 @@ import {
   deletarProntuario,
   uploadArquivoProntuario,
   deletarArquivoProntuario,
+  listarVeterinarios,
 } from '../../services/api';
-import type { Pet, Prontuario, ApiError, ProntuarioArquivo } from '../../services/api';
+import type { Pet, Prontuario, ApiError, ProntuarioArquivo, Veterinario } from '../../services/api';
 
 // --- TIPOS ---
 
@@ -54,6 +55,24 @@ const HistoricoModal: React.FC<HistoricoModalProps> = ({
   const [responsavel, setResponsavel] = useState(entrada?.responsavel || '');
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [veterinarios, setVeterinarios] = useState<Veterinario[]>([]);
+  const [isLoadingVets, setIsLoadingVets] = useState(true);
+
+  // Carrega lista de veterinários ao montar modal
+  useEffect(() => {
+    const fetchVeterinarios = async () => {
+      try {
+        const data = await listarVeterinarios();
+        setVeterinarios(data);
+      } catch (err) {
+        console.error('[HistoricoModal] Erro ao carregar veterinários:', err);
+      } finally {
+        setIsLoadingVets(false);
+      }
+    };
+
+    fetchVeterinarios();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,15 +169,34 @@ const HistoricoModal: React.FC<HistoricoModalProps> = ({
             <label htmlFor='responsavel' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
               Veterinário / Responsável
             </label>
-            <input
-              id='responsavel'
-              type='text'
-              value={responsavel}
-              onChange={e => setResponsavel(e.target.value)}
-              required
-              placeholder='Nome do profissional'
-              className='w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg'
-            />
+            {isLoadingVets ? (
+              <p className='text-gray-500 dark:text-gray-400 text-sm'>Carregando veterinários...</p>
+            ) : veterinarios.length === 0 ? (
+              <input
+                id='responsavel'
+                type='text'
+                value={responsavel}
+                onChange={e => setResponsavel(e.target.value)}
+                required
+                placeholder='Nome do profissional'
+                className='w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg'
+              />
+            ) : (
+              <select
+                id='responsavel'
+                value={responsavel}
+                onChange={e => setResponsavel(e.target.value)}
+                required
+                className='w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg'
+              >
+                <option value=''>Selecione um veterinário...</option>
+                {veterinarios.map(vet => (
+                  <option key={vet.id} value={vet.nome}>
+                    {vet.nome}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div>
