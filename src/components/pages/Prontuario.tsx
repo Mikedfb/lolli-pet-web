@@ -33,7 +33,9 @@ type TipoAtendimento = typeof TIPOS_ATENDIMENTO[number];
 
 // --- MODAL ADICIONAR/EDITAR HISTÓRICO ---
 
-interface HistoricoModalProps {
+// ---  ADICIONAR HISTÓRICO ---
+
+interface AdicionarHistoricoModalProps {
   pet: Pet;
   entrada?: Prontuario | null;
   onClose: () => void;
@@ -502,8 +504,10 @@ export default function Prontuario() {
   useEffect(() => {
     const fetchPets = async () => {
       try {
-        const data = await listarPets();
-        setPets(data);
+        // Simular um atraso de 1 segundo (latência de rede)
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1000);
       } catch (err) {
         const apiError = err as ApiError;
         setError(apiError.message || 'Erro ao carregar pets.');
