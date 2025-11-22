@@ -294,6 +294,33 @@ export const getMe = async (): Promise<UserData> => {
 };
 
 /**
+ * Interface para veterinário
+ */
+export interface Veterinario {
+  id: number;
+  nome: string;
+  email: string;
+}
+
+/**
+ * Lista todos os veterinários
+ *
+ * Envia para: GET /veterinarios/
+ * Auth: não (público)
+ */
+export const listarVeterinarios = async (): Promise<Veterinario[]> => {
+  console.log('[VETERINARIOS] Listando veterinários');
+
+  return apiRequest<Veterinario[]>(
+    '/veterinarios/',
+    {
+      method: 'GET',
+    },
+    false // Não requer autenticação
+  );
+};
+
+/**
  * Faz login do usuário
  *
  * Fluxo:
