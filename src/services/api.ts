@@ -294,6 +294,33 @@ export const getMe = async (): Promise<UserData> => {
 };
 
 /**
+ * Interface para veterinário
+ */
+export interface Veterinario {
+  id: number;
+  nome: string;
+  email: string;
+}
+
+/**
+ * Lista todos os veterinários
+ *
+ * Envia para: GET /veterinarios/
+ * Auth: não (público)
+ */
+export const listarVeterinarios = async (): Promise<Veterinario[]> => {
+  console.log('[VETERINARIOS] Listando veterinários');
+
+  return apiRequest<Veterinario[]>(
+    '/veterinarios/',
+    {
+      method: 'GET',
+    },
+    false // Não requer autenticação
+  );
+};
+
+/**
  * Faz login do usuário
  *
  * Fluxo:
@@ -713,28 +740,169 @@ export const deletarAgendamento = async (id: number): Promise<null> => {
 // ============================================================
 
 /**
- * Busca prontuários (pode filtrar por cliente ou pet)
- *
- * Envia para: GET /prontuarios?clienteId=xxx&petId=xxx
- * Headers: Authorization: Bearer {token}
- *
- * @param params - Parâmetros de filtro (opcional)
+ * Interface para arquivo de prontuário
  */
-export const buscarProntuarios = async (params?: Record<string, string>): Promise<unknown[]> => {
-  console.log('[PRONTUARIO] Buscando prontuários');
+export interface ProntuarioArquivo {
+  id: number;
+  nome: string;
+  filename?: string;
+  url: string;
+}
 
-  const queryString = params
-    ? '?' + new URLSearchParams(params).toString()
-    : '';
+/**
+ * Interface para entrada de prontuário
+ */
+export interface Prontuario {
+  id: number;
+  pet_id: number;
+  data: string;
+  tipo: 'Consulta' | 'Exame' | 'Vacina' | 'Banho' | 'Tosa' | 'Outro';
+  descricao: string;
+  responsavel: string;
+  arquivos: ProntuarioArquivo[];
+}
 
-  return apiRequest(
-    `/prontuarios${queryString}`,
+/**
+ * Interface para criar prontuário
+ */
+export interface CriarProntuarioData {
+  pet_id: number;
+  data: string;
+  tipo: 'Consulta' | 'Exame' | 'Vacina' | 'Banho' | 'Tosa' | 'Outro';
+  descricao: string;
+  responsavel: string;
+}
+
+/**
+ * Lista histórico de um pet
+ *
+ * Envia para: GET /prontuarios?pet_id=:id
+ * Headers: Authorization: Bearer {token}
+ */
+export const listarProntuarios = async (petId: number): Promise<Prontuario[]> => {
+  console.log('[PRONTUARIO] Listando prontuários do pet:', petId);
+
+  return apiRequest<Prontuario[]>(
+    `/prontuarios?pet_id=${petId}`,
     {
       method: 'GET',
     },
-    true // Inclui token de autenticação
+    true
   );
 };
+
+/**
+ * Cria uma entrada no prontuário
+ *
+ * Envia para: POST /prontuarios
+ * Headers: Authorization: Bearer {token}
+ */
+export const criarProntuario = async (data: CriarProntuarioData): Promise<Prontuario> => {
+  console.log('[PRONTUARIO] Criando entrada no prontuário');
+
+  return apiRequest<Prontuario>(
+    '/prontuarios',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    true
+  );
+};
+
+/**
+ * Atualiza uma entrada do prontuário
+ *
+ * Envia para: PUT /prontuarios/:id
+ * Headers: Authorization: Bearer {token}
+ */
+export const atualizarProntuario = async (id: number, data: Partial<CriarProntuarioData>): Promise<Prontuario> => {
+  console.log('[PRONTUARIO] Atualizando prontuário:', id);
+
+  return apiRequest<Prontuario>(
+    `/prontuarios/${id}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    },
+    true
+  );
+};
+
+/**
+ * Deleta uma entrada do prontuário
+ *
+ * Envia para: DELETE /prontuarios/:id
+ * Headers: Authorization: Bearer {token}
+ */
+export const deletarProntuario = async (id: number): Promise<null> => {
+  console.log('[PRONTUARIO] Deletando prontuário:', id);
+
+  return apiRequest<null>(
+    `/prontuarios/${id}`,
+    {
+      method: 'DELETE',
+    },
+    true
+  );
+};
+
+/**
+ * Upload de arquivo para um prontuário
+ *
+ * Envia para: POST /prontuarios/:id/arquivos
+ * Headers: Authorization: Bearer {token}
+ * Content-Type: multipart/form-data
+ */
+export const uploadArquivoProntuario = async (prontuarioId: number, arquivo: File): Promise<ProntuarioArquivo> => {
+  console.log('[PRONTUARIO] Fazendo upload de arquivo para prontuário:', prontuarioId);
+
+  const formData = new FormData();
+  formData.append('arquivo', arquivo);
+
+  const token = getToken();
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+  const response = await fetch(`${API_BASE_URL}/prontuarios/${prontuarioId}/arquivos`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const data = await response.json();
+    throw {
+      message: data?.errors?.join(', ') || data?.message || 'Erro ao fazer upload',
+      status: response.status,
+      details: data,
+    };
+  }
+
+  return response.json();
+};
+
+/**
+ * Deleta arquivo de prontuário
+ *
+ * Envia para: DELETE /prontuarios/arquivos/:id
+ * Headers: Authorization: Bearer {token}
+ */
+export const deletarArquivoProntuario = async (arquivoId: number): Promise<null> => {
+  console.log('[PRONTUARIO] Deletando arquivo:', arquivoId);
+
+  return apiRequest<null>(
+    `/prontuarios/arquivos/${arquivoId}`,
+    {
+      method: 'DELETE',
+    },
+    true
+  );
+};
+
+// Mantém função antiga para compatibilidade
+export const buscarProntuarios = listarProntuarios;
 
 // ============================================================
 // EXPORT DEFAULT
@@ -774,5 +942,11 @@ export default {
   deletarAgendamento,
 
   // Prontuários
+  listarProntuarios,
+  criarProntuario,
+  atualizarProntuario,
+  deletarProntuario,
+  uploadArquivoProntuario,
+  deletarArquivoProntuario,
   buscarProntuarios,
 };
